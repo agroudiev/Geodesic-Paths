@@ -1,52 +1,94 @@
 \documentclass[sigconf,nonacm]{acmart}
 
-% TODO: remove this from final version
+% TODO: remove this from final version (ptdr @antoine pourquoi tu l'as pas encore enlevé ça ?)
 \setcopyright{acmlicensed}
 \copyrightyear{2025}
 \acmYear{2025}
 \acmDOI{XXXXXXX.XXXXXXX}
 \acmConference[]{}{}{}
 \acmISBN{}
-
+\bibliographystyle{alpha}
 
 \begin{document}
 
-\title{Geodesic Paths and Distances}
+\title{Geodesic Paths and Distances\\[0\baselineskip]{\small Report on \textit{A Survey of Algorithms for Geodesic Paths and Distances}}}
 
 \author{Matthieu Boyer}
 \authornote{Both authors contributed equally.}
 \affiliation{%
-  \institution{École Normale Supérieure}
-  \city{Paris}
-  \country{France}}
+	\institution{École Normale Supérieure}
+	\city{Paris}
+	\country{France}}
 \email{matthieu.boyer@ens.fr}
 
 \author{Antoine Groudiev}
 \authornotemark[1]
 \affiliation{%
-  \institution{École Normale Supérieure}
-  \city{Paris}
-  \country{France}}
+	\institution{École Normale Supérieure}
+	\city{Paris}
+	\country{France}}
 \email{antoine.groudiev@ens.fr}
 
+\def\R{\mathbb{R}}
+\def\V{\mathbb{V}}
+\def\nv{n_{\V}}
+\def\E{E}
+\def\ne{n_{\E}}
+\def\F{\mathcal{F}}
+\def\nf{n_{\F}}
 
 \begin{abstract}
-  
+	In this report, we look at different methods to compute shortest-paths
+	on meshed $2$-manifolds embedded in $\R^{3}$, based on \cite{craneSurvey}.
+	We will most notably compare different types of methods, either coming from
+	the resolution of PDEs on the manifold and unfolding the embedding to $\R^{2}$.
+	We will also provide benchmarks on the different methods, implemented in Rust.
+	% for a blazingly fast™ result.za
 \end{abstract}
 
 \keywords{Geodesic, Paths, Distances}
 
 \begin{teaserfigure}
-    % ce serait bien d'avoir une image ici
-%   \includegraphics[width=\textwidth]{sampleteaser}
-  \caption{}
-  \Description{}
-  \label{fig:teaser}
+	% ce serait bien d'avoir une image ici
+	%   \includegraphics[width=\textwidth]{sampleteaser}
+	\caption{}
+	\Description{}
+	\label{fig:teaser}
 \end{teaserfigure}
 
 
 \maketitle
 
-\section{Introduction}
+\section*{Introduction}
 
+\section{Mathematical reminders}
+A $2$-manifold (without boundary) is a topological space in which all points have nieghbourhoods homeomorphic
+to disks (without boundary) in $\R^{2}$.
+This means that zooming enough on every point looks like the plane.
+
+In our context, we will be given a $2$-manifold already meshed\footnote{\cite{craneSurvey} gives a few
+	methods to create such a meshing.}, that is, a finite set $\V \subseteq \R^{3}$ of vertices
+(of cardinal $\nv$) and a finite set $\F \subseteq \left\llbracket 1, \ldots, \nf\right\rrbracket^{3}$
+of faces, given by the indices of the associated vertices.
+The edges $\E$ of the manifold are given by any subsets of size two of $f \in \F$.
+Because we can't have continuous functions, functions on the manifold will be represented as functions
+on $\V$, on $\E$ or on $\F$.
+As such, we will take any function and interpolate it linearly on each face, giving us a piecewise-linear
+function.
+
+A path on a piecewise-linear manifold can then be understood as interpolating on pieces of the manifold, or
+directly computing the curves on the mesh.
+The quality of the approximation by the mesh of the $2$-manifold will never be taken into account in the
+quality results.
+
+\section{PDE-based methods}
+\subsection{Theory}
+
+\subsection{Implementations}
+
+\section{Improved Chan-Han}
+
+
+\appendix
+\bibliography{report}
 \end{document}
