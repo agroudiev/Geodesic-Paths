@@ -8,9 +8,6 @@
 \acmConference[]{}{}{}
 \acmISBN{}
 \bibliographystyle{alpha}
-
-\begin{document}
-
 \title{Geodesic Paths and Distances\\[0\baselineskip]{\small Report on \textit{A Survey of Algorithms for Geodesic Paths and Distances}}}
 
 \author{Matthieu Boyer}
@@ -29,13 +26,16 @@
 	\country{France}}
 \email{antoine.groudiev@ens.fr}
 
+\def\abs#1{\left|#1\right|}
 \def\R{\mathbb{R}}
+
 \def\V{\mathbb{V}}
 \def\nv{n_{\V}}
 \def\E{E}
 \def\ne{n_{\E}}
 \def\F{\mathcal{F}}
 \def\nf{n_{\F}}
+\def\d{\mathrm{d}}
 
 \begin{abstract}
 	In this report, we look at different methods to compute shortest-paths
@@ -43,7 +43,7 @@
 	We will most notably compare different types of methods, either coming from
 	the resolution of PDEs on the manifold and unfolding the embedding to $\R^{2}$.
 	We will also provide benchmarks on the different methods, implemented in Rust.
-	% for a blazingly fast™ result.za
+	% for a blazingly fast™ result.
 \end{abstract}
 
 \keywords{Geodesic, Paths, Distances}
@@ -56,7 +56,7 @@
 	\label{fig:teaser}
 \end{teaserfigure}
 
-
+\begin{document}
 \maketitle
 
 \section*{Introduction}
@@ -68,7 +68,7 @@ This means that zooming enough on every point looks like the plane.
 
 In our context, we will be given a $2$-manifold already meshed\footnote{\cite{craneSurvey} gives a few
 	methods to create such a meshing.}, that is, a finite set $\V \subseteq \R^{3}$ of vertices
-(of cardinal $\nv$) and a finite set $\F \subseteq \left\llbracket 1, \ldots, \nf\right\rrbracket^{3}$
+(of cardinal $\nv$) and a finite set $\F \subseteq \left\llbracket 1, \nf\right\rrbracket^{3}$
 of faces, given by the indices of the associated vertices.
 The edges $\E$ of the manifold are given by any subsets of size two of $f \in \F$.
 Because we can't have continuous functions, functions on the manifold will be represented as functions
@@ -82,9 +82,73 @@ The quality of the approximation by the mesh of the $2$-manifold will never be t
 quality results.
 
 \section{PDE-based methods}
-\subsection{Theory}
+In this section we will study methods inspired by physical equations.
+Indeed, many physical phenomena propagate along the surfaces over time, and dissipate over space, thus
+allowing us to retrieve geodesics from solutions to the equations.
+
+\subsection{General Theory}
+Consider the parabolic heat equation
+\begin{equation*}
+	\frac{\d}{\d t}u_{t} = \Delta u_{t}.
+\end{equation*}
+Here $u_{t}$ is the temperature profile at time $t$ and $\Delta$ is the laplacian operator (or divergence of the gradient operator).
+However, on a piecewise-linear manifold, because functions on vertices are interpolated linearly to become
+functions on the manifold, the gradient is piecewise-constant and can be computed explicitly from the
+values at each vertex.
+Consider a face $f \in \F$ with vertices $p_{i}, p_{j}, p_{k} \in \R^{3}$.
+Let $e_{1} = p_{j} - p_{i}$ and $e_{2} = p_{k} - p_{i}$.
+The face normal is
+\begin{equation*}
+	n_{f} = \frac{e_{1} \times e_{2}}{\abs{e_{1} \times e_{2}}}
+\end{equation*}
+where $\times$ is the cross product in $\R^{3}$
+and thus the gradient, being perpendicular to level curves is
+\begin{equation*}
+	\nabla u_{\mid_{f}} = \frac{1}{2A_{f}}\sum_{l \in f}u_{l}(n_{f}\times e_{l})
+\end{equation*}
+where $A_{f} = \frac{1}{2}\abs{e_{1} \times e_{2}}$ is the area of face $f$ and $e_{l}$ is the \textbf{opposite} to vertex $l$.
+Note that we can represent the gradient as a matrix $G \in \R^{\nv \times 3\nf}$, although this
+representation is really inefficient for practical computation.
+The definition of the divergence then comes from the Gauss-Ostrogradski theorem by intregration by parts
+\begin{equation*}
+	\left(\nabla \cdot X\right)_{i} = \frac{1}{A_{i}}\sum_{f \ni i}\sum_{e \in f}\frac{1}{2}\cot{\left(\alpha_{e}^{f}\right)}\langle X_{f}, e\rangle
+\end{equation*}
+where $A_{i}$ is the Voronoi area associated with vertex $i$ and $\alpha_{e}^{f}$ is the angle at the vertex
+opposite to edge $e$ in $f$.
+
+Finally, we can define the Laplace-Beltrami operator (the piecewise-linear version of the continuous laplacian) as $\Delta = \div \cdot \nabla : \V \to \R$ or simply
+\begin{equation*}
+	(\Delta u)_{i} = \frac{1}{2A_{i}}\sum_{e = (i, j)}\left(\cot \alpha_{i, j} + \cot \beta_{i, j}\right)\left(u_{i} - u_{j}\right)
+\end{equation*}
+where $\alpha_{i, j}, \beta_{i, j}$ are the two angles opposite edge $(i, j)$.
+One could then see the Laplace-Beltrami operator as a matrix $L \in \R^{\nv \times \nv}$.
+
+\smallskip
+
+After the spatial discretization of the laplace operator we just described, operating a time discretization in a single
+backward Euler step for some fixed time $t$ will give us approximate solutions to the equation.
+If we want to find the distance maps from some set $X \subseteq \V$, we simply solve the linear equation
+associated to the continuous equation we need to solve.
 
 \subsection{Implementations}
+In our implementation, we compared multiple methods allowing to trace geodesics.
+Not all of those will actually compute the true geodesic distance, but something that can be drawn to it.
+
+\paragraph{Heat Method}
+This method is based on the heat equation $\nabla u_{t} = \frac{\d}{\d t}u_{0}$.
+We discretize it as:
+\begin{equation*}
+	(\mathrm{id} - t\Delta)u_{t} = u_{0}
+\end{equation*}
+Retrieving the true geodesic distance can the be done by first normalizing the gradient
+$X = -\nabla u_{t}/\abs{\nabla u_{t}}$ of the solution of the above equation that points along geodesics,
+then solving the Poisson equation $\Delta \phi = \div X$ to retrieve the true distance function.
+This fact comes from the Varadhan formula $\phi(x, y) = \lim_{t \to 0}\sqrt{-4t \log k_{t, x}(y)}$.
+\cite{Crane:2017:HMD} suggest that the proper value of $t$ to use for computations here is around $h^{2}$
+with $h$ the mean spacing between adjacent nodes, as $h\Delta$ is invariant with respect to scale.
+
+\paragraph{Poisson Equations}
+The equations in this paragraph all allow to draw geodesics, although they do not give
 
 \section{Improved Chan-Han}
 
