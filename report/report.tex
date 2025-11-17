@@ -1,5 +1,7 @@
 \documentclass[sigconf,nonacm]{acmart}
 
+\usepackage[textsize=small]{todonotes}
+
 \bibliographystyle{alpha}
 \title[Geodesic Paths and Distances]{Geodesic Paths and Distances\texorpdfstring{\\{\normalsize Report on \textit{A Survey of Algorithms for Geodesic Paths and Distances}}}{}}
 
@@ -53,18 +55,35 @@
 \maketitle
 
 \section*{Introduction}
+\textcolor{red}{TODO: motivate the problem, give applications, present the structure of the report.}
+
+After brief mathematical reminders in \autoref{sec:math-reminders}, we present two methods based on the resolution of Partial Differential Equations (PDEs) in \autoref{sec:pde-methods}.
+Then, in \autoref{sec:comp-geom-methods}, we discuss computational geometry methods, focusing on the Improved Chen-Han algorithm.
+Finally, we present experiments and results in \autoref{sec:experiments}, and conclude in the final section.
 
 \section{Mathematical reminders}
-A $2$-manifold (without boundary) is a topological space in which all points have nieghbourhoods homeomorphic
+\label{sec:math-reminders}
+Formally, a $2$-manifold (without boundary) is a topological space in which all points have neighborhoods homeomorphic
 to disks (without boundary) in $\R^{2}$.
-This means that zooming enough on every point looks like the plane.
+Intuitively, this means that zooming enough on any point of the manifold will make it look like a flat surface.
+In \autoref{fig:manifolds-examples}, we can see that some meshes are not manifolds, as some points are locally non-flat.
 
-In our context, we will be given a $2$-manifold already meshed\footnote{\cite{craneSurvey} gives a few
-	methods to create such a meshing.}, that is, a finite set $\V \subseteq \R^{3}$ of vertices
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\linewidth]{images/manifold-examples.png}
+	\caption{\textcolor{red}{TODO: tikzfy.} Examples of $2$-manifolds and non-manifold meshes.}
+	\Description{}
+	\label{fig:manifolds-examples}
+\end{figure}
+
+In our context, we will be given a $2$-manifold already meshed%
+\footnote{\cite{craneSurvey} gives a few methods to create such a meshing. In particular, our implementations of the methods are restricted without loss of generality to triangular faces; more general meshes can be considered through triangulation techniques.}%
+, that is, a finite set $\V \subseteq \R^{3}$ of vertices
 (of cardinal $\nv$) and a finite set $\F \subseteq \left\llbracket 1, \nf\right\rrbracket^{3}$
 of faces, given by the indices of the associated vertices.
-The edges $\E$ of the manifold are given by any subsets of size two of $f \in \F$.
-Because we can't have continuous functions, functions on the manifold will be represented as functions
+The edges $\E$ of the manifold are given by any subsets of size two of a face $f \in \F$.
+\todo{Reformuler la phrase ci-dessous}
+Because we cannot have continuous functions, functions on the manifold will be represented as functions
 on $\V$, on $\E$ or on $\F$.
 As such, we will take any function and interpolate it linearly on each face, giving us a piecewise-linear
 function.
@@ -75,6 +94,7 @@ The quality of the approximation by the mesh of the $2$-manifold will never be t
 quality results.
 
 \section{PDE-based methods}
+\label{sec:pde-methods}
 In this section we will study methods inspired by Partial Differential Equations (PDE) that arise from models
 of physical phenomena.
 Indeed, many physical phenomena propagate along the surfaces over time, and dissipate over space, thus
@@ -173,6 +193,7 @@ $\rho \frac{\partial^{2}u}{\partial t^{2}}$ caused by the local acceleration.
 
 
 \section{Computational Geometry methods}
+\label{sec:comp-geom-methods}
 While PDE-based methods provide a general framework to compute geodesic distances on arbitrary, possibly non-meshed manifolds, we can leverage the fact that our manifold is meshed to design more efficient algorithms.
 A whole class of such algorithms, arising from computational geometry, can be classified according to two main caracteristics.
 
@@ -186,7 +207,15 @@ In the following, we focus on a global and exact method, the Improved Chen-Han a
 The Improved Chen-Han (ICH) algorithm is based on the continuous Dijkstra paradigm introduced by Mitchell et al. for the Mitchell-Mount-Papadimitriou (MMP) algorithm \cite{mitchell1987discrete}.
 The main idea is to apply Dijkstra's algorithm in the continuous setting of a piecewise-linear manifold.
 
-A first natural approach could be to consider the graph formed by the vertices and edges of the mesh, and run Dijkstra's algorithm on it. However, this would only yield paths that follow the edges of the mesh, which can be arbitrarily longer than the true geodesic paths on the surface.
+A first natural approach could be to consider the graph formed by the vertices and edges of the mesh, and run Dijkstra's algorithm on it. However, this would only yield paths that follow the edges of the mesh, which can be arbitrarily longer than the true geodesic paths on the surface (see \autoref{fig:suboptimal-dijkstra}).
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=.4\linewidth]{example-image-a}
+	\caption{Example of suboptimality of applying Dijkstra's algorithm on the graph formed by the vertices and edges of the mesh. The red path follows the edges of the mesh, while the blue path is the true geodesic path on the surface, which is shorter.}
+	\Description{}
+	\label{fig:suboptimal-dijkstra}
+\end{figure}
 
 Instead, we would like to consider each point on the surface as a potential node in the graph.
 However, since the shortest path on a single face is always a straight line, it is sufficient to only consider points on the edges of the mesh as potential nodes.
@@ -201,10 +230,66 @@ is defined on edge $e$, between points $b_0$ and $b_1$ (see \autoref{fig:ich-win
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{images/window-illustration.png}
-	\caption{Illustration of a window $w=(s, p, e, b_0, b_1, d_0, d_1, \sigma)$.}
+	\caption{{\textcolor{red}{TODO: tikzfy.}} Illustration of a window $w=(s, p, e, b_0, b_1, d_0, d_1, \sigma)$.}
 	\Description{}
 	\label{fig:ich-windows}
 \end{figure}
+
+\subsection{Window management and pruning}
+While all revolving around the same core idea of continuous Dijkstra, different algorithms differ in how they manage and propagate windows \cite{craneSurvey}.
+
+The original MMP algorithm does not perform aggressive pruning of windows, but trim overlapping windows on the same edge to avoid redundancy later on.
+It uses a priority queue to always propagate the window with the smallest minimum distance first, ensuring both global optimality and early trimming of redundant windows.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=.4\linewidth]{example-image-b}
+	\caption{Window trimming in the MMP algorithm.}
+	\Description{}
+	\label{fig:window-trimming}
+\end{figure}
+
+To achieve a better theoretical complexity, the Chen-Han algorithm substitutes the priority queue with a First-In-First-Out (FIFO) queue, propagating windows in the order they were created. To speed up the algorithm in practice, a pruning rule called ``one angle, one split'' is introduced; however, overlapping windows are not trimmed.
+
+The Improved Chen-Han algorithm combines both approaches, using a priority queue to always propagate the window with the smallest minimum distance first, while also employing the ``one angle, one split'' pruning rule from Chen-Han. The pruning strategy is extended to trim overlapping windows on the same edge as well.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=.4\linewidth]{example-image-c}
+	\caption{Extended ``one angle, one split'' pruning rule in the Improved Chen-Han algorithm.}
+	\Description{}
+	\label{fig:one-angle-one-split}
+\end{figure}
+
+\subsection{Algorithm outline and example}
+We know give a high-level outline of the Improved Chen-Han algorithm, and illustrate it on a toy example.
+
+\textcolor{red}{TODO}
+
+
+\subsection{Implementation details}
+We implemented the Improved Chen-Hand algorithm from scratch in Rust, following the description from \cite{xin2009improving}.
+We provide here a short description of some implementation details, data structures used, as well as some difficulties we encountered and limitations of our implementation.
+
+\subsubsection{Data structures}
+As other methods, the input of the algorithm is a $2$-manifold represented as a triangle mesh, that is a set of vertices $\V$ and a set of faces ($3$-tuples) $\F$.
+However, we also need to represent edges $\E$ explicitly, as windows are defined on edges. We therefore employ an edge data structure, storing for each edge both geometric information (length) and topological information (adjacent faces, vertices, \dots).
+Notably, we precompute the twin edges for each edge, which is repeatedly invoked during window propagation.
+
+The main algorithm relies on a priority queue of windows, ordered by the minimum distance from the source to any point in the window.
+We implement this priority queue as a binary heap, using Rust's standard library implementation.
+Windows are represented as structs containing all the necessary information for propagation, as described above.
+Information about the vertices, such as the edge from which the shortest path to the vertex originates, is also stored during the main loop of the algorithm to enable path reconstruction later on.
+
+\subsubsection{Limitations}
+Two main limitations of our implementation are worth mentioning: paths along the edges fail to be computed successfully, and some vertices may not receive a distance value at the end of the algorithm when the geometry is particularly complex.
+
+\section{Experiments and results}
+\label{sec:experiments}
+\textcolor{red}{TODO: do experiments, provide results, compare methods.}
+
+\textcolor{red}{TODO: highlight the limitations of each method, and the tradeoffs.}
+
+\section*{Conclusion}
 
 \appendix
 \bibliography{report}
