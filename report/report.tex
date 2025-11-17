@@ -8,9 +8,9 @@
 \acmConference[]{}{}{}
 \acmISBN{}
 \bibliographystyle{alpha}
-\title{Geodesic Paths and Distances\\[0\baselineskip]{\small Report on \textit{A Survey of Algorithms for Geodesic Paths and Distances}}}
+\title{Geodesic Paths and Distances\\{\small Report on \textit{A Survey of Algorithms for Geodesic Paths and Distances}}}
 
-\author{Matthieu Boyer}
+\author{Matthieu Pierre Boyer}
 \authornote{Both authors contributed equally.}
 \affiliation{%
 	\institution{École Normale Supérieure}
@@ -82,7 +82,8 @@ The quality of the approximation by the mesh of the $2$-manifold will never be t
 quality results.
 
 \section{PDE-based methods}
-In this section we will study methods inspired by physical equations.
+In this section we will study methods inspired by partial differential equations that arise from models
+of physical phenomena.
 Indeed, many physical phenomena propagate along the surfaces over time, and dissipate over space, thus
 allowing us to retrieve geodesics from solutions to the equations.
 
@@ -116,7 +117,7 @@ The definition of the divergence then comes from the Gauss-Ostrogradski theorem 
 where $A_{i}$ is the Voronoi area associated with vertex $i$ and $\alpha_{e}^{f}$ is the angle at the vertex
 opposite to edge $e$ in $f$.
 
-Finally, we can define the Laplace-Beltrami operator (the piecewise-linear version of the continuous laplacian) as $\Delta = \div \cdot \nabla : \V \to \R$ or simply
+Finally, we can define the Laplace-Beltrami operator (the piecewise-linear version of the continuous laplacian) as $\Delta = (\nabla \cdot) \circ \nabla : \V \to \R$ or simply
 \begin{equation*}
 	(\Delta u)_{i} = \frac{1}{2A_{i}}\sum_{e = (i, j)}\left(\cot \alpha_{i, j} + \cot \beta_{i, j}\right)\left(u_{i} - u_{j}\right)
 \end{equation*}
@@ -131,24 +132,52 @@ If we want to find the distance maps from some set $X \subseteq \V$, we simply s
 associated to the continuous equation we need to solve.
 
 \subsection{Implementations}
-In our implementation, we compared multiple methods allowing to trace geodesics.
-Not all of those will actually compute the true geodesic distance, but something that can be drawn to it.
+In our implementation, we compared multiple methods based on physical phenomena allowing to trace geodesics,
+or at least geodesic-like curves.
+Indeed, not all of those compute the true geodesic distance, but some sense of distance that can be drawn
+and integrated to find shortest paths.
 
 \paragraph{Heat Method}
-This method is based on the heat equation $\nabla u_{t} = \frac{\d}{\d t}u_{0}$.
+This method is based on the heat equation $\nabla u_{t} = \frac{\d}{\d t}u_{0}$, which models the
+evolution of temperature profiles $u_{t}$ in time in a given material, which here will be our surface,
+from the initial profil $u_{0}$.
+It can be derived
 We discretize it as:
 \begin{equation*}
 	(\mathrm{id} - t\Delta)u_{t} = u_{0}
 \end{equation*}
 Retrieving the true geodesic distance can the be done by first normalizing the gradient
 $X = -\nabla u_{t}/\abs{\nabla u_{t}}$ of the solution of the above equation that points along geodesics,
-then solving the Poisson equation $\Delta \phi = \div X$ to retrieve the true distance function.
+then solving the Poisson equation $\Delta \phi = \nabla \cdot X$ to retrieve the true distance function.
 This fact comes from the Varadhan formula $\phi(x, y) = \lim_{t \to 0}\sqrt{-4t \log k_{t, x}(y)}$.
+
 \cite{Crane:2017:HMD} suggest that the proper value of $t$ to use for computations here is around $h^{2}$
 with $h$ the mean spacing between adjacent nodes, as $h\Delta$ is invariant with respect to scale.
 
 \paragraph{Poisson Equations}
-The equations in this paragraph all allow to draw geodesics, although they do not give
+The equations in this paragraph all allow to draw geodesics-like curves, although they do not give the
+actual metric on the manifold.
+They are all based on the Poisson equation
+\begin{equation*}
+	\Delta u = u_{0},
+\end{equation*}
+which can be derived, for example, from the Maxwell equations to compute the electrostatic potential
+along a charge distribution, or from the momentum equation to compute the pressure in a incompressible
+fluid given its velocity.
+% TODO: implement and provide informations
+
+
+\paragraph{Wavefront Propagation}
+The hyperbolic wavefront propagation equation
+\begin{equation*}
+	\frac{\d^{2}}{\d t^{2}}u_{t} = c^{2}\Delta u_{t}, \text{or}, \square u = 0,
+\end{equation*}
+where $\square$ is the d'Alembert operator, models the propagation of a wave in a material,
+which will again be our surface here.
+It arises for example the response of the surface to some elastic deformation $u$ considering the stress tensor
+$T = E\nabla u$ with $E$ the homogenous modulus of elasticity, and considering the inertial force
+$\rho \frac{\partial^{2}u}{\partial t^{2}}$ caused by the local acceleration.
+
 
 \section{Improved Chan-Han}
 
