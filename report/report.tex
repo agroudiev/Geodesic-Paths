@@ -1,14 +1,7 @@
 \documentclass[sigconf,nonacm]{acmart}
 
-% TODO: remove this from final version (ptdr @antoine pourquoi tu l'as pas encore enlevé ça ?)
-\setcopyright{acmlicensed}
-\copyrightyear{2025}
-\acmYear{2025}
-\acmDOI{XXXXXXX.XXXXXXX}
-\acmConference[]{}{}{}
-\acmISBN{}
 \bibliographystyle{alpha}
-\title{Geodesic Paths and Distances\\{\small Report on \textit{A Survey of Algorithms for Geodesic Paths and Distances}}}
+\title{Geodesic Paths and Distances\\{\normalsize Report on \textit{A Survey of Algorithms for Geodesic Paths and Distances}}}
 
 \author{Matthieu Pierre Boyer}
 \authornote{Both authors contributed equally.}
@@ -49,9 +42,10 @@
 \keywords{Geodesic, Paths, Distances}
 
 \begin{teaserfigure}
-	% ce serait bien d'avoir une image ici
-	%   \includegraphics[width=\textwidth]{sampleteaser}
-	\caption{}
+	% on peut remplacer l'image par quelque chose de plus horizontal du même genre, ou mettre plusieurs images côte à côte
+	\centering
+	\includegraphics[width=.4\textwidth]{images/rabbit-paths.png}
+	\caption{Geodesic paths on a meshed $2$-manifold computed with our implementation of the Improved Chen-Han algorithm. Faces are colored from red to green according to the distance of their barycenter to the source point. The geodesic path to each vertex is drawn in blue.}
 	\Description{}
 	\label{fig:teaser}
 \end{teaserfigure}
@@ -179,7 +173,7 @@ $T = E\nabla u$ with $E$ the homogenous modulus of elasticity, and considering t
 $\rho \frac{\partial^{2}u}{\partial t^{2}}$ caused by the local acceleration.
 
 
-\section{Improved Chan-Han}
+\section{Improved Chen-Han}
 
 
 \appendix
