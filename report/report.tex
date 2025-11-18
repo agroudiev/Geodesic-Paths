@@ -298,6 +298,26 @@ Two main limitations of our implementation are worth mentioning: paths along the
 
 \textcolor{red}{TODO: highlight the limitations of each method, and the tradeoffs.}
 
+\subsection{ICH practical runtime}
+Theoretically, the Improved Chen-Han algorithm runs in $\mathcal{O}(n^2 \log n)$ time on a mesh with $n$ vertices, which is worse than the $\mathcal{O}(n^2)$ previously obtained by the Chen-Han algorithm, the $\log n$ factor coming from the priority queue management.
+
+\cite{craneSurvey} reports that in practice, the ICH algorithm runs in sub-quadratic time on average, and dramatically improves the performance of the original Chen-Han algorithm, without supporting such a claim with a precise benchmark. We therefore conducted experiments to benchmark the practical runtime of our implementation of the ICH algorithm on various meshes, and report the results in \autoref{fig:ich-experiments-results}.
+
+We collected a set of \textcolor{red}{TODO: number} meshes of various sizes, ranging from \textcolor{red}{TODO: min} to \textcolor{red}{TODO: max} vertices.
+Mesh come from various sources, including the Thingi10k dataset \cite{zhou2016thingi10kdataset100003dprinting}, filtered to only contain manifolds with a single connected component.
+Each mesh was processed by our implementation of the ICH algorithm, starting from a single source vertex chosen arbitrarily.
+For each mesh, the algorithm is run \textcolor{red}{TODO: number} times with different source vertices, the points in \autoref{fig:ich-experiments-results} corresponding to the average runtime over these runs.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=.9\linewidth]{images/ich_benchmark.pdf}
+	\caption{\textcolor{red}{TODO: increase figure size} Benchmark of the time complexity of the ICH algorithm on various 3D meshes, as a function of the number of vertices. Slope: $1.58$, $r^2$: $0.98$.}
+	\Description{}
+	\label{fig:ich-experiments-results}
+\end{figure}
+
+The results confirm the sub-quadratic practical runtime of the ICH algorithm, with a fitted slope of $1.58$ on a log-log scale, corresponding to a time complexity of approximately $\mathcal{O}(n^{1.58})$ in practice. Care should be taken when interpreting this result, as the practical runtime may depend on the specific geometry of the meshes used in the benchmark, and may not generalize to all possible meshes. The number of vertices is not always a fair indicator of the complexity of the geometry, and other factors such as the distribution of vertex valences and curvature may also impact the practical runtime of the algorithm.
+
 \section*{Conclusion}
 
 \appendix
