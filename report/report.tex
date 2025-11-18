@@ -56,7 +56,14 @@
 \maketitle
 
 \section*{Introduction}
-\textcolor{red}{TODO: motivate the problem, give applications, present the structure of the report.}
+Computing the distance between two points and retrieving a shortest path is, in general, a fundamental problem in computer science. While the problem is well understood in flat, Euclidean spaces, it becomes more challenging when considering curved surfaces.
+
+\textcolor{red}{TODO: mathematical problem formulation in general}
+
+Such a problem arises in various fields, including computer graphics, robotics, medical imaging, and computer vision. In computer graphics, geodesic distances are used for texture mapping; in robotics, they form the cornerstone of path planning algorithms on complex terrains; in medical imaging, they assist in analyzing anatomical structures; and in computer vision, they improve object recognition and shape analysis.
+\textcolor{red}{TODO: add citations}.
+
+The ability to efficiently compute geodesic distances and paths is therefore crucial for many applications in which the size of the problem is large, and where real-time performance is required. In the polyhedral setting, where the surface is represented as a mesh of vertices, edges, and faces, the number of vertices is derived from the desired accuracy of the representation, and can thus be very large. Algorithms with a low theoretical and practical complexity are therefore essential to handle such large-scale problems.
 
 After brief mathematical reminders in \autoref{sec:math-reminders}, we present two methods based on the resolution of Partial Differential Equations (PDEs) in \autoref{sec:pde-methods}.
 Then, in \autoref{sec:comp-geom-methods}, we discuss computational geometry methods, focusing on the Improved Chen-Han algorithm.
@@ -69,7 +76,7 @@ to disks (without boundary) in $\R^{2}$.
 Intuitively, this means that zooming enough on any point of the manifold will make it look like a flat surface.
 In \autoref{fig:manifolds-examples}, we can see that some meshes are not manifolds, as some points are locally non-flat.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=.4\linewidth]{images/manifold.png}
 	\includegraphics[width=.5\linewidth]{images/nonmanifold.png}
@@ -211,7 +218,7 @@ The main idea is to apply Dijkstra's algorithm in the continuous setting of a pi
 
 A first natural approach could be to consider the graph formed by the vertices and edges of the mesh, and run Dijkstra's algorithm on it. However, this would only yield paths that follow the edges of the mesh, which can be arbitrarily longer than the true geodesic paths on the surface (see \autoref{fig:suboptimal-dijkstra}).
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=.4\linewidth]{example-image-a}
 	\caption{Example of suboptimality of applying Dijkstra's algorithm on the graph formed by the vertices and edges of the mesh. The red path follows the edges of the mesh, while the blue path is the true geodesic path on the surface, which is shorter.}
@@ -242,7 +249,7 @@ While all revolving around the same core idea of continuous Dijkstra, different 
 
 The original MMP algorithm does not perform aggressive pruning of windows, but trim overlapping windows on the same edge to avoid redundancy later on.
 It uses a priority queue to always propagate the window with the smallest minimum distance first, ensuring both global optimality and early trimming of redundant windows.
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=.4\linewidth]{example-image-b}
 	\caption{Window trimming in the MMP algorithm.}
@@ -254,7 +261,7 @@ To achieve a better theoretical complexity, the Chen-Han algorithm substitutes t
 
 The Improved Chen-Han algorithm combines both approaches, using a priority queue to always propagate the window with the smallest minimum distance first, while also employing the ``one angle, one split'' pruning rule from Chen-Han. The pruning strategy is extended to trim overlapping windows on the same edge as well.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=.4\linewidth]{example-image-c}
 	\caption{Extended ``one angle, one split'' pruning rule in the Improved Chen-Han algorithm.}
