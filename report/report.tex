@@ -91,8 +91,9 @@ In our context, we will be given a $2$-manifold already meshed%
 (of cardinal $\nv$) and a finite set $\F \subseteq \left\llbracket 1, \nf\right\rrbracket^{3}$
 of faces, given by the indices of the associated vertices.
 The edges $\E$ of the manifold are given by any subsets of size two of a face $f \in \F$.
-\todo{Reformuler la phrase ci-dessous}
-Because we cannot have continuous functions, functions on the manifold will be represented as functions
+\todo{@antoine, avis?}
+Because continuous functions on the manifold cannot be fully represented in memory, and especially by a
+finite number of points on the mesh, functions on the manifold will be approximated by functions
 on $\V$, on $\E$ or on $\F$.
 As such, we will take any function and interpolate it linearly on each face, giving us a piecewise-linear
 function.
@@ -122,27 +123,27 @@ Consider a face $f \in \F$ with vertices $p_{i}, p_{j}, p_{k} \in \R^{3}$.
 Let $e_{1} = p_{j} - p_{i}$ and $e_{2} = p_{k} - p_{i}$.
 The face normal is
 \begin{equation*}
-	n_{f} = \frac{e_{1} \times e_{2}}{\abs{e_{1} \times e_{2}}},
+	\overrightarrow{n_{f}} = \frac{e_{1} \times e_{2}}{\abs{e_{1} \times e_{2}}},
 \end{equation*}
 where $\times$ is the cross product in $\R^{3}$
 and thus the gradient, being perpendicular to level curves is
-\begin{equation*}
-	\nabla u_{\mid_{f}} = \frac{1}{2A_{f}}\sum_{l \in f}u_{l}(n_{f}\times e_{l}),
-\end{equation*}
+\begin{equation}
+	\nabla u_{\mid_{f}} = \frac{1}{2A_{f}}\sum_{l \in f}u_{l}(\overrightarrow{n_{f}}\times e_{l}), \label{eq:facegrad}
+\end{equation}
 where $A_{f} = \frac{1}{2}\abs{e_{1} \times e_{2}}$ is the area of face $f$ and $e_{l}$ is the \textbf{opposite} to vertex $l$.
 Note that we can represent the gradient as a matrix $G \in \R^{\nv \times 3\nf}$, although this
 representation is really inefficient for practical computation.
 The definition of the divergence then comes from the Gauss-Ostrogradski theorem by intregration by parts
-\begin{equation*}
-	\left(\nabla \cdot X\right)_{i} = \frac{1}{A_{i}}\sum_{f \ni i}\sum_{e \in f}\frac{1}{2}\cot{\left(\alpha_{e}^{f}\right)}\langle X_{f}, e\rangle,
-\end{equation*}
+\begin{equation}
+	\left(\nabla \cdot X\right)_{i} = \frac{1}{A_{i}}\sum_{f \ni i}\sum_{e \in f}\frac{1}{2}\cot{\left(\alpha_{e}^{f}\right)}\langle X_{f}, e\rangle, \label{eq:divergence}
+\end{equation}
 where $A_{i}$ is the Voronoi area associated with vertex $i$ and $\alpha_{e}^{f}$ is the angle at the vertex
 opposite to edge $e$ in $f$.
 
 Finally, we can define the Laplace-Beltrami operator (the piecewise-linear version of the continuous laplacian) as $\Delta = (\nabla \cdot) \circ \nabla : \V \to \R$ or simply
-\begin{equation*}
-	(\Delta u)_{i} = \frac{1}{2A_{i}}\sum_{e = (i, j)}\left(\cot \alpha_{i, j} + \cot \beta_{i, j}\right)\left(u_{i} - u_{j}\right),
-\end{equation*}
+\begin{equation}
+	(\Delta u)_{i} = \frac{1}{2A_{i}}\sum_{e = (i, j)}\left(\cot \alpha_{i, j} + \cot \beta_{i, j}\right)\left(u_{i} - u_{j}\right),\label{eq:laplacian}
+\end{equation}
 where $\alpha_{i, j}, \beta_{i, j}$ are the two angles opposite edge $(i, j)$.
 One could then see the Laplace-Beltrami operator as a matrix $L \in \R^{\nv \times \nv}$.
 
@@ -153,21 +154,25 @@ backward Euler step for some fixed time $t$ will give us approximate solutions t
 If we want to find the distance maps from some set $X \subseteq \V$, we simply solve the linear equation
 associated to the continuous equation we need to solve.
 
-\subsection{Implementations}
+\subsection{Physical Equations}
 In our implementation, we compared multiple methods based on physical phenomena allowing to trace geodesics,
 or at least geodesic-like curves.
 Indeed, not all of those compute the true geodesic distance, but some sense of distance that can be drawn
 and integrated to find shortest paths.
 
 \paragraph{Heat Method}
-This method is based on the heat equation $\nabla u_{t} = \frac{\d}{\d t}u_{0}$, which models the
+This method is based on the heat equation
+\begin{equation}
+	\nabla u_{t} = \frac{\d}{\d t}u_{0},\label{eq:heat}
+\end{equation}
+which models the
 evolution of temperature profiles $u_{t}$ in time in a given material, which here will be our surface,
 from the initial profil $u_{0}$.
 It can be derived
 We discretize it as:
-\begin{equation*}
-	(\mathrm{id} - t\Delta)u_{t} = u_{0}.
-\end{equation*}
+\begin{equation}
+	(\mathrm{id} - t\Delta)u_{t} = u_{0}.\label{eq:discrheat}
+\end{equation}
 Retrieving the true geodesic distance can then be done by first normalizing the gradient
 $X = -\nabla u_{t}/\abs{\nabla u_{t}}$ of the solution of the above equation that points along geodesics,
 then solving the Poisson equation $\Delta \phi = \nabla \cdot X$ to retrieve the true distance function.
@@ -180,9 +185,9 @@ with $h$ the mean spacing between adjacent nodes, as $h\Delta$ is invariant with
 The equations in this paragraph all allow to draw geodesics-like curves, although they do not give the
 actual metric on the manifold.
 They are all based on the Poisson equation
-\begin{equation*}
-	\Delta u = u_{0},
-\end{equation*}
+\begin{equation}
+	\Delta u = u_{0},\label{eq:poisson}
+\end{equation}
 which can be derived, for example, from the Maxwell equations to compute the electrostatic potential
 along a charge distribution, or from the momentum equation to compute the pressure in an incompressible
 fluid given its velocity.
@@ -190,16 +195,89 @@ fluid given its velocity.
 
 
 \paragraph{Wavefront Propagation}
-The hyperbolic wavefront propagation equation
+The hyperbolic wavefront propagation equation (or d'Alembert equation)
 \begin{equation*}
-	\frac{\d^{2}}{\d t^{2}}u_{t} = c^{2}\Delta u_{t}, \text{or}, \square u = 0,
+	\frac{\d^{2}}{\d t^{2}}u_{t} = c^{2}\Delta u_{t}, \text{or}, \square u = 0
 \end{equation*}
 where $\square$ is the d'Alembert operator, models the propagation of a wave in a material,
 which will again be our surface here.
-It arises for example the response of the surface to some elastic deformation $u$ considering the stress tensor
-$T = E\nabla u$ with $E$ the homogenous modulus of elasticity, and considering the inertial force
-$\rho \frac{\partial^{2}u}{\partial t^{2}}$ caused by the local acceleration.
+It arises for example the response of the surface to some elastic deformation $u$ (say, a stone dropping in
+a pond) considering the stress tensor $T = E\nabla u$ with $E$ the homogenous modulus of elasticity (here,
+the surface tension of the water) and considering the inertial force
+$\rho \frac{\partial^{2}u}{\partial t^{2}}$ caused by the local acceleration (the stone moving the water
+down on impact).
 
+However, while retrieving distance information from Equations \eqref{eq:heat} and \eqref{eq:poisson} is
+not too difficult and doable by solving a simple linear system, retrieving distance from propagating
+wavefronts is more easily done from the non-linear hyperbolic eikonal equation
+\begin{equation}
+	\begin{cases}
+		\abs{\nabla u}^{2} = 1 & \text{on } M,         \\
+		u = 0                  & \text{on }\partial M,
+	\end{cases}\label{eq:eikonal}
+\end{equation}
+which directly characterizes the distance to the boundary $\partial M$ (which in our case will be the set
+we're computing the distance to).
+The eikonal equation arises as the fundamental equation specifying the light paths in space given the
+refractive index function of the media encountered.
+In our case, there is a unique medium to be considered, and light sources $\partial M$ that emit the light.
+
+\subsection{Implementation Details}
+Our input manifold is given as a triangular mesh, that is a set $\V$ of vertices of $\R^{3}$ and a set
+$\F \subseteq \left\llbracket 1, \abs{\V}\right\rrbracket^{3}$ of faces passed by indices.
+We are also given a set $\partial M$ of sources or boundaries which will be points we compute the distance
+to (or from).
+
+\subsubsection{Linear equations}
+In the case of linear equations such as Equations \eqref{eq:heat} and \eqref{eq:poisson}, we only have to
+construct and solve a linear system of equations from the manifold and the set of sources:
+
+\begin{itemize}
+	\item We compute the gradient for the manifold and a function $u$ using the formula of Equation
+	      \ref{eq:facegrad}, as the dynamic array of the face vectors.
+	\item We also compute the laplacian operator for the manifold as the $\nv \times \nv$ matrix using
+	      the cotangent formula of Equation \eqref{eq:laplacian} by iterating on all faces to iterate
+	      on all edges and thus all vertices in the end.
+	\item We discretize in time the equation with a single step of backwards Euler method and solve the
+	      induced linear system, as done in Equation \eqref{eq:discrheat}.
+\end{itemize}
+
+For the heat equation, we can also retrieve approximate geodesics passing through vertices by solving
+in $\phi$ the Poisson equation $\Delta \phi = \div X$ on the normalized gradient $X$ of the temperature
+profile.
+This is done by simply computing the divergence operator on the manifold from Equation \ref{eq:divergence},
+and iterating on the faces to fill the divergence matrix of the manifold and solving another linear system.
+
+\subsubsection{Fast Marching Method}
+While the simple linear system solving works directly for the heat equation, solving for the geodesic paths
+arising from the eikonal equation \eqref{eq:eikonal} is more difficult, as the equation is non-linear and
+thus easy system resolution techniques will not work.
+
+To work around this issue, we implemented the fast marching method, based on \cite{kimmelsethian}.
+The method initializes the distance at the sources $\partial M$ to $0$ and iterates using a priority queue
+on the neighbours of the already seen points.
+The distances are not interated according to paths along edges, but so that the eikonal equation is
+verified.
+If we know values $\phi_{i}, \phi_{j}$ at two corners, we pick $\phi_{k}$ so that the slope of the triangle
+$(i, j, k)$ for $\phi$ (so the norm of the gradient of $\phi$, $\left\lVert\nabla \phi\right\rVert$) is $1$.
+
+\subsubsection{Limitations}
+\paragraph{Linear PDEs}
+The main issue that arises with the linear PDEs we consider is numerical stability.
+Indeed, the laplacian of a manifold will usually be singular, so we need to add regularization terms at
+every linear system resolution.
+This yields a lot of numerical artifact when the discretization steps are too big for the precision we
+can compute.
+Moreover, while the method is polynomial, it scales quite poorly as the number of vertices increases, the
+algorithm being in $\mathcal{O}(\nv^{3})$.
+
+\paragraph{Fast Marching}
+For the fast marching algorithm, the method is much shorter, as it runs in $\mathcal{O}(\nv \log \nv)$, but
+this comes at the cost of stability when considering too small angles.
+Indeed, the order in which vertices are updated might violate the causality property of the propagation.
+Indeed, if triangles have obtuse angles, there might be point $i$ being closer to the source than another
+point $j$ but the distance in $j$ might be finalized before the distance at $i$.
+A solution to this exists but might not terminate due to its non-locality.
 
 \section{Computational Geometry methods}
 \label{sec:comp-geom-methods}
