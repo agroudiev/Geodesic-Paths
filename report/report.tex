@@ -91,7 +91,6 @@ In our context, we will be given a $2$-manifold already meshed%
 (of cardinal $\nv$) and a finite set $\F \subseteq \left\llbracket 1, \nf\right\rrbracket^{3}$
 of faces, given by the indices of the associated vertices.
 The edges $\E$ of the manifold are given by any subsets of size two of a face $f \in \F$.
-\todo{@antoine, avis?}
 Because continuous functions on the manifold cannot be fully represented in memory, and especially by a
 finite number of points on the mesh, functions on the manifold will be approximated by functions
 on $\V$, on $\E$ or on $\F$.
@@ -298,8 +297,10 @@ A first natural approach could be to consider the graph formed by the vertices a
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=.4\linewidth]{example-image-a}
-	\caption{Example of suboptimality of applying Dijkstra's algorithm on the graph formed by the vertices and edges of the mesh. The red path follows the edges of the mesh, while the blue path is the true geodesic path on the surface, which is shorter.}
+	\begin{tikzpicture}
+		\input{images/dijkstra-suboptimal.tex}
+	\end{tikzpicture}
+	\caption{Example of suboptimality of applying Dijkstra's algorithm on the graph formed by the vertices and edges of the mesh. The red path follows the edges of the mesh, while the blue path is the true geodesic path on the 2D surface, which is shorter.}
 	\Description{}
 	\label{fig:suboptimal-dijkstra}
 \end{figure}
@@ -394,7 +395,7 @@ For each mesh, the algorithm is run \textcolor{red}{TODO: number} times with dif
 	\label{fig:ich-experiments-results}
 \end{figure}
 
-The results confirm the sub-quadratic practical runtime of the ICH algorithm, with a fitted slope of $1.58$ on a log-log scale, corresponding to a time complexity of approximately $\mathcal{O}(n^{1.58})$ in practice. Care should be taken when interpreting this result, as the practical runtime may depend on the specific geometry of the meshes used in the benchmark, and may not generalize to all possible meshes. The number of vertices is not always a fair indicator of the complexity of the geometry, and other factors such as the distribution of vertex valences and curvature may also impact the practical runtime of the algorithm.
+The results confirm the sub-quadratic practical runtime of the ICH algorithm, with a fitted slope of $1.60$ on a log-log scale, corresponding to a time complexity of approximately $\mathcal{O}(n^{1.60})$ in practice. Care should be taken when interpreting this result, as the practical runtime may depend on the specific geometry of the meshes used in the benchmark, and may not generalize to all possible meshes. The number of vertices is not always a fair indicator of the complexity of the geometry, and other factors such as the distribution of vertex valences and curvature may also impact the practical runtime of the algorithm.
 
 \section*{Conclusion}
 
