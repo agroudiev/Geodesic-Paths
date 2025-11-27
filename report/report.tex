@@ -103,6 +103,7 @@ A path on a piecewise-linear manifold can then be understood as interpolating on
 directly computing the curves on the mesh.
 The quality of the approximation by the mesh of the $2$-manifold will never be taken into account in the
 quality results.
+Finding the best approximation of a curved surface by a mesh is a whole other problem that we will not address in this report.
 
 \section{PDE-based methods}
 \label{sec:pde-methods}
@@ -373,17 +374,19 @@ Information about the vertices, such as the edge from which the shortest path to
 \subsubsection{Limitations}
 Two main limitations of our implementation are worth mentioning: paths along the edges fail to be computed successfully, and some vertices may not receive a distance value at the end of the algorithm when the geometry is particularly complex.
 
+\textcolor{red}{TODO: give an example of challenging geometry on which ICH fails to propagate to all vertices.}
+
 \section{Experiments and results}
 \label{sec:experiments}
-\textcolor{red}{TODO: do experiments, provide results, compare methods.}
-
-\textcolor{red}{TODO: highlight the limitations of each method, and the tradeoffs.}
+In this section, we present experiments and results obtained from our implementations of the heat method, fast marching, and the Improved Chen-Han algorithm.
+All methods being implemented from scratch in the same programming language (Rust), and optimized up to a similar level, we believe the comparison to be fairly representative of the practical performances of each algorithm.
 
 \subsection{Methodology}
 We collected a set of \textcolor{red}{TODO: number} meshes of various sizes, ranging from \textcolor{red}{TODO: min} to \textcolor{red}{TODO: max} vertices.
 Mesh come from various sources, including the Thingi10k dataset \cite{zhou2016thingi10kdataset100003dprinting}, filtered to only contain manifolds with a single connected component.
 Each mesh was processed by our implementation of each method, starting from a single source vertex chosen arbitrarily.
-For each mesh, each algorithm is run \textcolor{red}{TODO: number} times with different source vertices, the points in \autoref{fig:ich-experiments-results} corresponding to the average runtime over these runs.
+For each mesh, each algorithm is run \textcolor{red}{TODO: number} times with different source vertices, each point corresponding to the average runtime over these runs.
+All experiments were conducted on a MacBook Pro with a 3.22 GHz Apple M1 Pro chip and 32GB of RAM.
 
 Care should be taken when interpreting the following results, as the runtime depends on the specific geometry of the meshes used in the benchmark, and may not generalize to all possible meshes. 
 The number of vertices is not always a fair indicator of the complexity of the geometry, and other factors such as the distribution of vertex valences and curvature may also impact the practical runtime of the algorithm.
@@ -407,9 +410,13 @@ Theoretically, the Improved Chen-Han algorithm runs in $\mathcal{O}(n^2 \log n)$
 The results confirm the sub-quadratic practical runtime of the ICH algorithm, with a fitted slope of $1.60$ on a log-log scale, corresponding to a time complexity of approximately $\mathcal{O}(n^{1.60})$ in practice.
 
 \subsection{Comparison and discussion}
+\textcolor{red}{TODO: highlight the limitations of each method, and the tradeoffs.}
 
 \section*{Conclusion}
-\textcolor{red}{TODO}
+In this report, we investigated different methods to compute shortest-paths on meshed $2$-manifolds embedded in $\R^{3}$.
+We presented two classes of methods: PDE-based methods, which solve physical equations on the manifold to retrieve geodesic distances, and computational geometry methods, which leverage the meshed structure of the manifold to design efficient algorithms.
+We provided from-scratch implementations of three methods: the heat method, fast marching, and the Improved Chen-Han algorithm, and compared their practical performances on various datasets of meshes.
+Our experiments brought to light the practical runtime of each method, as well as their respective strengths and limitations.
 
 \appendix
 \bibliography{report}
