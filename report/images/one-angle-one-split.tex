@@ -1,0 +1,27 @@
+\coordinate (P0) at (1, -1);
+\coordinate (P1) at (6, -0.5);
+\coordinate (v) at (3.5, 1.5);
+\coordinate (a0) at (1, .43);
+\coordinate (a1) at (4, 1.28);
+\coordinate (b0) at (2.5, 1.05);
+\coordinate (b1) at (6, .43);
+
+\draw[blue, thick] (0, 0) -- (7, 0) node[midway, below] {$e$};
+\draw[thick] (0,0) -- (v) node[above] {$v$};
+\draw[thick] (7,0) -- (v);
+
+\fill (P0) circle (0.05) node[left] {$p_0$};
+\fill (P1) circle (0.05) node[right] {$p_1$};
+
+\draw[thick] (P0) -- (a0);
+\draw[thick] (P0) -- (a1);
+\draw[thick] (P1) -- (b0);
+\draw[thick] (P1) -- (b1);
+
+\draw[dashed] (P0) -- (v);
+\draw[dashed] (P1) -- (v);
+
+\fill[teal, opacity=0.4] (P0) -- (a0) -- (v) -- cycle;
+\fill[teal, opacity=0.4] (P1) -- (b0) -- (v) -- cycle;
+\fill[teal, opacity=0.4] (P1) -- (v) -- (b1) -- cycle;
+\fill[purple, opacity=0.4] (P0) -- (v) -- (a1) -- cycle;

@@ -304,7 +304,7 @@ A first natural approach could be to consider the graph formed by the vertices a
 	\begin{tikzpicture}
 		\input{images/dijkstra-suboptimal.tex}
 	\end{tikzpicture}
-	\caption{Example of suboptimality of applying Dijkstra's algorithm on the graph formed by the vertices and edges of the mesh. The \textcolor{purple}{red} path follows the edges of the mesh, while the \textcolor{teal}{blue} path is the true geodesic path on the 2D surface, which is shorter.}
+	\caption{Example of suboptimality of applying Dijkstra's algorithm on the graph formed by the vertices and edges of the mesh. The \textcolor{purple}{red} path follows the edges of the mesh, while the \textcolor{teal}{green} path is the true geodesic path on the 2D surface, which is shorter.}
 	\Description{}
 	\label{fig:suboptimal-dijkstra}
 \end{figure}
@@ -354,7 +354,7 @@ The Improved Chen-Han algorithm combines both approaches, using a priority queue
 	\begin{tikzpicture}
 		\input{images/one-angle-one-split.tex}
 	\end{tikzpicture}
-	\caption{Illustration of the ``one angle, one split'' pruning rule: if two windows on the same edge ${\color{blue}e}$ split on the same edge $v$, only three out of the four resulting windows are kept.}
+	\caption{Illustration of the ``one angle, one split'' pruning rule: if two windows on the same edge ${\color{blue}e}$ split on the same edge $v$, only three out of the four resulting windows are kept, as the one in \textcolor{purple}{red} cannot lead to a shorter path.}
 	\Description{}
 	\label{fig:one-angle-one-split}
 \end{figure}
