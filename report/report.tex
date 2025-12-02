@@ -336,8 +336,10 @@ The original MMP algorithm does not perform aggressive pruning of windows, but t
 It uses a priority queue to always propagate the window with the smallest minimum distance first, ensuring both global optimality and early trimming of redundant windows.
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=.4\linewidth]{example-image-b}
-	\caption{Window trimming in the MMP algorithm.}
+	\begin{tikzpicture}
+		\input{images/window-mmp.tex}
+	\end{tikzpicture}
+	\caption{Window trimming in the MMP algorithm: overlapping windows on the same edge ${\color{blue}e}$ (left) are trimmed to avoid redundancy (right).}
 	\Description{}
 	\label{fig:window-trimming}
 \end{figure}

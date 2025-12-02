@@ -1,0 +1,31 @@
+\coordinate (E00) at (0,0);
+\coordinate (E10) at (4,0);
+
+\coordinate (E01) at (4.3,0);
+\coordinate (E11) at (8.3,0);
+
+\coordinate (S00) at (1,3);
+\coordinate (S10) at (3,3);
+\coordinate (S01) at (1+4.3,3);
+\coordinate (S11) at (3+4.3,3);
+
+\draw[blue, thick] (E00) -- (E10) node[pos=0.8, below] {$e$};
+\draw[blue, thick] (E01) -- (E11) node[pos=0.8, below] {$e$};
+
+\fill[purple, opacity=0.4] (S00) -- (0.5,0) -- (2.5,0) -- cycle;
+\fill[teal, opacity=0.3] (S10) -- (1.5,0) -- (3.5,0) -- cycle;
+\draw[fill] (S00) -- (0.5,0) circle (0.05);
+\draw[fill] (S00) -- (2.5,0) circle (0.05);
+\draw[fill] (S10) -- (1.5,0) circle (0.05);
+\draw[fill] (S10) -- (3.5,0) circle (0.05);
+\fill[color=purple] (S00) circle (0.05) node[left] {$s_0$};
+\fill[color=teal] (S10) circle (0.05) node[right] {$s_1$};
+
+\fill[purple, opacity=0.4] (S01) -- (0.5+4.3,0) -- (2.0+4.3,0) -- cycle;
+\fill[teal, opacity=0.3] (S11) -- (2.0+4.3,0) -- (3.5+4.3,0) -- cycle;
+\draw[fill] (S01) -- (0.5+4.3,0) circle (0.05);
+\draw[fill] (S01) -- (2.0+4.3,0) circle (0.05);
+\draw[fill] (S11) -- (2.0+4.3,0) circle (0.05);
+\draw[fill] (S11) -- (3.5+4.3,0) circle (0.05);
+\fill[color=purple] (S01) circle (0.05) node[left] {$s_0$};
+\fill[color=teal] (S11) circle (0.05) node[right] {$s_1$};
