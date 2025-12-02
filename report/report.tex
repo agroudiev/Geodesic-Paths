@@ -1,6 +1,7 @@
 \documentclass[sigconf,nonacm]{acmart}
 
 \usepackage[textsize=small]{todonotes}
+\usepackage{subcaption}
 
 \bibliographystyle{alpha}
 \title[Geodesic Paths and Distances]{Geodesic Paths and Distances\texorpdfstring{\\{\normalsize Report on \textit{A Survey of Algorithms for Geodesic Paths and Distances}}}{}}
@@ -341,7 +342,7 @@ It uses a priority queue to always propagate the window with the smallest minimu
 	\end{tikzpicture}
 	\caption{Window trimming in the MMP algorithm: overlapping windows on the same edge ${\color{blue}e}$ (left) are trimmed to avoid redundancy (right).}
 	\Description{}
-	\label{fig:window-trimming}
+	\label{fig:window-trimming-mmp}
 \end{figure}
 
 To achieve a better theoretical complexity, the Chen-Han algorithm substitutes the priority queue with a First-In-First-Out (FIFO) queue, propagating windows in the order they were created. To speed up the algorithm in practice, a pruning rule called ``one angle, one split'' is introduced; however, overlapping windows are not trimmed.
@@ -350,10 +351,22 @@ The Improved Chen-Han algorithm combines both approaches, using a priority queue
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=.4\linewidth]{example-image-c}
-	\caption{Extended ``one angle, one split'' pruning rule in the Improved Chen-Han algorithm.}
+	\begin{tikzpicture}
+		\input{images/one-angle-one-split.tex}
+	\end{tikzpicture}
+	\caption{Illustration of the ``one angle, one split'' pruning rule: \textcolor{red}{TODO}}
 	\Description{}
 	\label{fig:one-angle-one-split}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}
+		\input{images/window-filtering.tex}
+	\end{tikzpicture}
+	\caption{Windows are redudant and can be trimmed if \textcolor{red}{TODO}}
+	\Description{}
+	\label{fig:window-trimming}
 \end{figure}
 
 \subsection{Algorithm outline and example}
