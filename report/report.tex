@@ -320,8 +320,11 @@ is defined on edge $e$, between points $b_0$ and $b_1$ (see \autoref{fig:ich-win
 
 \begin{figure}
 	\centering
-	\includegraphics[width=\linewidth]{images/window-illustration.png}
-	\caption{{\textcolor{red}{TODO: tikzfy.}} Illustration of a window $w=(s, p, e, b_0, b_1, d_0, d_1, \sigma)$.}
+	% \includegraphics[width=\linewidth]{images/window-illustration.png}
+	\begin{tikzpicture}
+		\input{images/window-illustration.tex}
+	\end{tikzpicture}
+	\caption{Illustration of a window $w=(s, p, {\color{blue}e}, {\color{red}b_0}, {\color{red}b_1}, {\color{teal}d_0}, {\color{teal}d_1}, \sigma)$.}
 	\Description{}
 	\label{fig:ich-windows}
 \end{figure}
