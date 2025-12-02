@@ -1,0 +1,23 @@
+\coordinate (v0) at (4, 2);
+\coordinate (v1) at (0, 2);
+\coordinate (v2) at (2, 0);
+\coordinate (A) at (3, 2);
+\coordinate (B) at (1, 2);
+\coordinate (p) at (-0.5, 0.5);
+
+\draw[dashed, thick, purple] (p) -- (v0);
+\draw[dashed, thick, purple] (p) -- (v1);
+\draw[dashed, thick, purple] (p) -- (v2);
+
+\fill (v0) circle (0.07) node[above right] {$v_0(d_0)$};
+\fill (v1) circle (0.07) node[above left] {$v_1(d_1)$};
+\fill (v2) circle (0.07) node[below] {$v_2(d_2)$};
+\draw[thick] (v0) -- (v1) -- (v2) -- cycle;
+
+\fill (A) circle (0.07) node[above] {$b_1$};
+\fill (B) circle (0.07) node[above] {$b_0$};
+
+\fill (p) circle (0.07) node[left] {$p(d)$};
+\fill[teal, opacity=0.4] (p) -- (A) -- (B) -- cycle;
+\draw[dashed, thick, teal] (p) -- (A);
+\draw[dashed, thick, teal] (p) -- (B);

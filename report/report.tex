@@ -3,6 +3,8 @@
 \usepackage[textsize=small]{todonotes}
 \usepackage{subcaption}
 
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
 \bibliographystyle{alpha}
 \title[Geodesic Paths and Distances]{Geodesic Paths and Distances\texorpdfstring{\\{\normalsize Report on \textit{A Survey of Algorithms for Geodesic Paths and Distances}}}{}}
 
@@ -332,6 +334,7 @@ is defined on edge $e$, between points $b_0$ and $b_1$ (see \autoref{fig:ich-win
 
 \subsection{Window management and pruning}
 While all revolving around the same core idea of continuous Dijkstra, different algorithms differ in how they manage and propagate windows \cite{craneSurvey}.
+All \emph{propagate} windows, that is, given a window on an edge, either (a) the window goes through a vertex $v$, and two new windows are created on the two edges adjacent to $v$ in the face opposite to $e$; or (b) the window is contained in the opposite edge, and a single window is kept. However, the different algorithms differ in how they prune and prioritize windows to achieve better theoretical and practical complexity.
 
 The original MMP algorithm does not perform aggressive pruning of windows, but trim overlapping windows on the same edge to avoid redundancy later on; this simple trimming strategy is illustrated in \autoref{fig:window-trimming-mmp}.
 It uses a priority queue to always propagate the window with the smallest minimum distance first, ensuring both global optimality and early trimming of redundant windows.
@@ -347,7 +350,7 @@ It uses a priority queue to always propagate the window with the smallest minimu
 
 To achieve a better theoretical complexity, the Chen-Han algorithm substitutes the priority queue with a First-In-First-Out (FIFO) queue, propagating windows in the order they were created. To speed up the algorithm in practice, a pruning rule called ``one angle, one split'' is introduced, which we illustrated in \autoref{fig:one-angle-one-split}; however, overlapping windows are not trimmed.
 
-The Improved Chen-Han algorithm combines both approaches, using a priority queue to always propagate the window with the smallest minimum distance first, while also employing the ``one angle, one split'' pruning rule from Chen-Han. Another filtering strategy, illustrated in \autoref{fig:window-trimming}, is introduced to discard windows that cannot lead to shorter paths than already existing windows on the same edge.
+The Improved Chen-Han algorithm combines both approaches, using a priority queue to always propagate the window with the smallest minimum distance first, while also employing the ``one angle, one split'' pruning rule from Chen-Han. Another filtering strategy, illustrated in \autoref{fig:window-trimming}, is introduced to discard windows that cannot lead to shorter paths than already explored window going through the same vertices.
 
 \begin{figure}[ht]
 	\centering
@@ -364,13 +367,13 @@ The Improved Chen-Han algorithm combines both approaches, using a priority queue
 	\begin{tikzpicture}
 		\input{images/window-filtering.tex}
 	\end{tikzpicture}
-	\caption{Illustration of the window filtering in ICH. If one the following inequalities holds, the window $w$ can be safely discarded:}
+	\caption{Illustration of the window filtering in ICH. For each vertex $v_i$, we denote by $d_i$ the shortest distance to $v_i$ found so far. If one the following inequalities holds, the window $w$ can be safely discarded: $d+\norm{pb_0} > d_0 + \norm{v_0b_1}$, $d+ \norm{pb_1} > d_1 + \norm{v_1b_1}$, or $d+\norm{pb_0} > d_2 + \norm{v_2b_0}$.}
 	\Description{}
 	\label{fig:window-trimming}
 \end{figure}
 
 \subsection{Algorithm outline and example}
-We know give a high-level outline of the Improved Chen-Han algorithm, and illustrate it on a toy example.
+We now give a high-level outline of the Improved Chen-Han algorithm, and illustrate it on a toy example.
 
 \textcolor{red}{TODO}
 
