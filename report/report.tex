@@ -304,7 +304,7 @@ A first natural approach could be to consider the graph formed by the vertices a
 	\begin{tikzpicture}
 		\input{images/dijkstra-suboptimal.tex}
 	\end{tikzpicture}
-	\caption{Example of suboptimality of applying Dijkstra's algorithm on the graph formed by the vertices and edges of the mesh. The red path follows the edges of the mesh, while the blue path is the true geodesic path on the 2D surface, which is shorter.}
+	\caption{Example of suboptimality of applying Dijkstra's algorithm on the graph formed by the vertices and edges of the mesh. The \textcolor{purple}{red} path follows the edges of the mesh, while the \textcolor{teal}{blue} path is the true geodesic path on the 2D surface, which is shorter.}
 	\Description{}
 	\label{fig:suboptimal-dijkstra}
 \end{figure}
@@ -325,7 +325,7 @@ is defined on edge $e$, between points $b_0$ and $b_1$ (see \autoref{fig:ich-win
 	\begin{tikzpicture}
 		\input{images/window-illustration.tex}
 	\end{tikzpicture}
-	\caption{Illustration of a window $w=(s, p, {\color{blue}e}, {\color{red}b_0}, {\color{red}b_1}, {\color{teal}d_0}, {\color{teal}d_1}, \sigma)$.}
+	\caption{Illustration of a window $w=(s, p, {\color{blue}e}, {\color{purple}b_0}, {\color{purple}b_1}, {\color{teal}d_0}, {\color{teal}d_1}, \sigma)$.}
 	\Description{}
 	\label{fig:ich-windows}
 \end{figure}
@@ -333,7 +333,7 @@ is defined on edge $e$, between points $b_0$ and $b_1$ (see \autoref{fig:ich-win
 \subsection{Window management and pruning}
 While all revolving around the same core idea of continuous Dijkstra, different algorithms differ in how they manage and propagate windows \cite{craneSurvey}.
 
-The original MMP algorithm does not perform aggressive pruning of windows, but trim overlapping windows on the same edge to avoid redundancy later on.
+The original MMP algorithm does not perform aggressive pruning of windows, but trim overlapping windows on the same edge to avoid redundancy later on; this simple trimming strategy is illustrated in \autoref{fig:window-trimming-mmp}.
 It uses a priority queue to always propagate the window with the smallest minimum distance first, ensuring both global optimality and early trimming of redundant windows.
 \begin{figure}[ht]
 	\centering
@@ -345,16 +345,16 @@ It uses a priority queue to always propagate the window with the smallest minimu
 	\label{fig:window-trimming-mmp}
 \end{figure}
 
-To achieve a better theoretical complexity, the Chen-Han algorithm substitutes the priority queue with a First-In-First-Out (FIFO) queue, propagating windows in the order they were created. To speed up the algorithm in practice, a pruning rule called ``one angle, one split'' is introduced; however, overlapping windows are not trimmed.
+To achieve a better theoretical complexity, the Chen-Han algorithm substitutes the priority queue with a First-In-First-Out (FIFO) queue, propagating windows in the order they were created. To speed up the algorithm in practice, a pruning rule called ``one angle, one split'' is introduced, which we illustrated in \autoref{fig:one-angle-one-split}; however, overlapping windows are not trimmed.
 
-The Improved Chen-Han algorithm combines both approaches, using a priority queue to always propagate the window with the smallest minimum distance first, while also employing the ``one angle, one split'' pruning rule from Chen-Han. The pruning strategy is extended to trim overlapping windows on the same edge as well.
+The Improved Chen-Han algorithm combines both approaches, using a priority queue to always propagate the window with the smallest minimum distance first, while also employing the ``one angle, one split'' pruning rule from Chen-Han. Another filtering strategy, illustrated in \autoref{fig:window-trimming}, is introduced to discard windows that cannot lead to shorter paths than already existing windows on the same edge.
 
 \begin{figure}[ht]
 	\centering
 	\begin{tikzpicture}
 		\input{images/one-angle-one-split.tex}
 	\end{tikzpicture}
-	\caption{Illustration of the ``one angle, one split'' pruning rule: \textcolor{red}{TODO}}
+	\caption{Illustration of the ``one angle, one split'' pruning rule: if two windows on the same edge ${\color{blue}e}$ split on the same edge $v$, only three out of the four resulting windows are kept.}
 	\Description{}
 	\label{fig:one-angle-one-split}
 \end{figure}
@@ -364,7 +364,7 @@ The Improved Chen-Han algorithm combines both approaches, using a priority queue
 	\begin{tikzpicture}
 		\input{images/window-filtering.tex}
 	\end{tikzpicture}
-	\caption{Windows are redudant and can be trimmed if \textcolor{red}{TODO}}
+	\caption{Illustration of the window filtering in ICH. If one the following inequalities holds, the window $w$ can be safely discarded:}
 	\Description{}
 	\label{fig:window-trimming}
 \end{figure}
