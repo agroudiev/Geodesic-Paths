@@ -1,0 +1,23 @@
+\begin{tikzpicture}[x={(1,0)},z={(-1/3,-1/4)},y={(0,1)},font=\sffamily, scale=.9]
+	\tkzThreeDBox[box color=orange,draw=none]{(0,0,0)}{(1,0,0)}{(0,2,0)}{(0,0,4)}
+	\fill[orange!80,canvas is yz plane at x=1] (0.5,0.5) coordinate(X) rectangle ++(1,3);
+	\shade[opacity=0.7,left color=orange!80,right color=blue!50!cyan!60!white,canvas is xy plane at z=0.5]
+	(1,0.5) rectangle ++(6,1);
+	\shade[opacity=0.7,left color=orange!80,right color=blue!50!cyan!60!white,canvas is xz plane at y=0.5]
+	(1,0.5) rectangle ++(6,3);
+	\shadedraw[draw=red!50,left color=orange!15,right color=orange!40]
+	(1.5,.15,1) --  (1.5,.85,1) -- plot[variable=\x,domain=0:3,samples=60]
+	(\x+1.5,{.85+0.1*sin(720*\x/3)},1) --++(0,0.25,0) -- ++(0.5,-0.6,0)
+	-- ++(-0.5,-0.6,0) --++(0,0.25,0)
+	-- plot[variable=\x,domain=3:0,samples=60]
+	(\x+1.5,{0.15+0.1*sin(720*\x/3)},1) -- cycle;
+	\draw[dashed,draw=orange!20,thick] (X) -- ++(6,0,0);
+	\tkzThreeDBox[box color=white,fill opacity=0,draw=orange!20,thick]{(1,0.5,0.5)}{(6,0,0)}{(0,1,0)}{(0,0,3)}
+	\tkzThreeDBox[box color=cyan,draw=none]{(7,0,0)}{(1,0,0)}{(0,2,0)}{(0,0,4)}
+	\node at (0.5,1,4) {$T_2$};
+	\node (Q) at (3.5,.75,2) {$\delta Q = -\frac{\partial T}{\delta x}$};
+	\node at (7.5,1,4) {$T_1$};
+	\draw[{Bar}{Latex}-{Latex}{Bar}] (1,.3,4) -- (7,.3,4) node[midway,fill=white]{$\delta x$};
+	\node[above=1cm of Q,draw] {$T_2>T_1$};
+\end{tikzpicture}
+

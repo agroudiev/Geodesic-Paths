@@ -1,0 +1,13 @@
+\begin{tikzpicture}[yscale=.5, xscale=.75]
+	\node[draw=black, circle] (A) at (0, 0) {A};
+	\node[draw=black, circle] (B) at (4, 0) {B};
+	\node[draw=black, circle] (C) at (2, 2) {C};
+	\node[draw=black, circle] (D) at (2, -2) {D};
+	\draw
+	(A.north east) -- node[fill=white, rectangle, midway] {$1$} (C.south west)
+	(A.south east) -- node[fill=white, rectangle, midway] {$1$} (D.north west)
+	(A.east) -- node[fill=white, rectangle, midway] {$1$} (B.west)
+	(C.south east) -- node[fill=white, rectangle, midway] {$1$} (B.north west)
+	(D.north east) -- node[fill=white, rectangle, midway] {$1$} (B.south west)
+	;
+\end{tikzpicture}

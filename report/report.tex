@@ -2,6 +2,8 @@
 
 \usepackage[textsize=small]{todonotes}
 \usepackage{subcaption}
+\usetikzlibrary{3d, arrows.meta, positioning}
+\input{acmart/tikz3dheat}
 
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
@@ -76,8 +78,9 @@ Finally, we present experiments and results in \autoref{sec:experiments}, and co
 
 \section{Mathematical reminders}
 \label{sec:math-reminders}
-Formally, a $2$-manifold (without boundary) is a topological space in which all points have neighborhoods homeomorphic
-to disks (without boundary) in $\R^{2}$.
+Formally, a $2$-manifold (without boundary) is a topological space in which all points have neighborhoods
+homeomorphic to disks (without boundary) in $\R^{2}$.
+Such an homeomorphism is called a chart.
 Intuitively, this means that zooming enough on any point of the manifold will make it look like a flat surface.
 In \autoref{fig:manifolds-examples}, we can see that some meshes are not manifolds, as some points are locally non-flat.
 
@@ -90,8 +93,37 @@ In \autoref{fig:manifolds-examples}, we can see that some meshes are not manifol
 	\label{fig:manifolds-examples}
 \end{figure}
 
+When considering a $2$-manifold $M$, a (smooth) curve is a (smooth) application $\gamma: I \to M$.
+Two curves $\gamma_{1}, \gamma_{2}$ on the same interval $(-\epsilon, \epsilon)$ based at
+$q = \gamma_{1}(0) = \gamma_{2}(0)$ are equivalent if, in some chart, they have same first Taylor expansion
+around $0$.
+Its tangent vector $\dot{\gamma}(0)$ at $q = \gamma(0)$ is the equivalence class\footnote{This allows us to
+	define the (covariant) derivative of a vector field on a manifold, as well its gradient and Laplacian,
+	but the mathematics behind these definitions are behind the scope of this report.} of $\gamma$ in the
+space of smooth curves in $M$.
+The tangent space at $q \in M$ is the set $T_{q}M$ of all tangent vectors of smooth curves based at $q$.
+It has the structure of a $2$-dimensional vector space.
+A Riemannian tensor $g$ on $M$ is an application which to $q \in M$ associates a positive definite symmetric
+endomorphism of $T_{q}M$.
+A $2$-manifold equipped with a Riemannian tensor $g$ is called a Riemannian $2$-manifold.
+We can define the length of a curve $\gamma: [a, b] \to M$ on such a manifold as
+\begin{equation}
+	L(\gamma) = \int_{a}^{b}\sqrt{g_{\gamma(t)}\left(\dot{\gamma}(t), \dot{\gamma}(t)\right)}\d t.
+\end{equation}
+The geodesic (curve) between $p$ and $q$ is the curve $\gamma$ verifying
+\begin{equation*}
+	\gamma = \arg\min_{\gamma: [0, 1] \to M, \gamma(0) = p, \gamma(1) = q} L(\gamma).
+\end{equation*}
+The length of the geodesic between $p$ and $q$ is the called the geodesic distance.
+As presented above, computing the geodesic curves and the geodesic distances has multiple applications,
+and this is the problem we will be tackling in this report.
+
+\smallskip
+
 In our context, we will be given a $2$-manifold already meshed%
-\footnote{\cite{craneSurvey} gives a few methods to create such a meshing. In particular, our implementations of the methods are restricted without loss of generality to triangular faces; more general meshes can be considered through triangulation techniques.}%
+\footnote{\cite{craneSurvey} gives a few methods to create such a meshing.
+	In particular, our implementations of the methods are restricted without loss of generality to triangular
+	faces; more general meshes can be considered through triangulation techniques.}%
 , that is, a finite set $\V \subseteq \R^{3}$ of vertices
 (of cardinal $\nv$) and a finite set $\F \subseteq \left\llbracket 1, \nf\right\rrbracket^{3}$
 of faces, given by the indices of the associated vertices.
@@ -194,7 +226,9 @@ It can be derived from the first principle of thermodynamics on infinitesimal sl
 describes the fact that spatial variations of temperature spread quadratically with regard to time.
 This means that spreading temperature from point A to point B will take of the order of magnitude of the
 square of the distance between A and B.
-\todo{add a figure}
+\begin{center}
+	\input{images/heat-equation}
+\end{center}
 
 We can discretize the heat equation in time as
 \begin{equation}
@@ -277,7 +311,19 @@ actually equivalent to the effective resistance between $x$ and $y$ in an electr
 This might be a more consistent distance model when modeling for example the most efficient path taking
 traffic into account, as it allows for multiple-route distance diminishment, as shown in
 \cite{klein1993resistance} for example.
-\todo{add a figure}
+\begin{center}
+	\hfill
+	\begin{minipage}{.45\columnwidth}
+		In this graph, the resistance distance between $A$ and $B$ is $0.5$, while the geodesic distance is
+		$1$.
+	\end{minipage}
+	\hfill
+	\begin{minipage}{.45\columnwidth}
+		\input{images/resistance}
+	\end{minipage}
+	\hfill
+\end{center}
+
 
 \smallskip
 
@@ -320,8 +366,7 @@ wavefronts is more easily done from the non-linear hyperbolic eikonal equation
 	\end{cases}\label{eq:eikonal}
 \end{equation}
 which directly characterizes the distance to the boundary $\partial M$ (which again in our case will be
-the set
-we're computing the distance to).
+the set we're computing the distance to).
 The eikonal equation arises as the fundamental equation specifying the light paths in space given the
 refractive index function of the media encountered.
 In our case, there is a unique medium to be considered, and light sources $\partial M$ that emit the light.
@@ -342,7 +387,8 @@ construct and solve a linear system of equations from the manifold and the set o
 	\item We also compute the laplacian operator for the manifold as the $\nv \times \nv$ matrix using
 	      the cotangent formula of Equation \eqref{eq:laplacian} by iterating on all faces to iterate
 	      on all edges and thus all vertices in the end.
-	\item If needed, we discretize in time the equation with a single step of backwards Euler method as done in Equation \eqref{eq:discrheat}.
+	\item If needed, we discretize in time the equation with a single step of backwards Euler method as done
+	      in Equation \eqref{eq:discrheat}.
 	\item We solve the induced linear system.
 \end{itemize}
 
@@ -352,11 +398,12 @@ profile.
 This is done by simply computing the divergence operator on the manifold from Equation \ref{eq:divergence},
 and iterating on the faces to fill the divergence matrix of the manifold and solving another linear system.
 
-\subsubsection{Spectral Methods}
+\smallskip
+
 For the spectral methods, we compute the laplacian matrix in the same fashion as above, and compute its
 eigenspaces (as eigenvalues and eigenvectors).
-We then sort those by increasing eigenvalues, skip the first one and, for different values of $k$ the
-embedding size, compute the approximate geodesic.
+We then sort those by increasing eigenvalues, skip the first one and compute the approximate geodesic
+distance for a given value of $k$.
 
 \subsubsection{Fast Marching Method}
 While the simple linear system solving works directly for the heat equation, solving for the geodesic paths
@@ -370,6 +417,8 @@ The distances are not interated according to paths along edges, but so that the 
 verified.
 If we know values $\phi_{i}, \phi_{j}$ at two corners, we pick $\phi_{k}$ so that the slope of the triangle
 $(i, j, k)$ for $\phi$ (so the norm of the gradient of $\phi$, $\left\lVert\nabla \phi\right\rVert$) is $1$.
+\todo{Figure}
+
 
 \subsubsection{Limitations}
 \paragraph{Linear PDEs}
@@ -380,6 +429,13 @@ This yields a lot of numerical artifact when the discretization steps are too bi
 can compute.
 Moreover, while the method is polynomial, it scales quite poorly as the number of vertices increases, the
 algorithm being in $\mathcal{O}(\nv^{3})$.
+
+\paragraph{Spectral and Poisson Methods}
+Some of the issues that arise with those methods have already been described above, because they are all
+based on the quite slow solving of linear systems, but the main issue with those methods is that they only
+allow to describe some distance transform from sources/some distance transform on the step.
+Those methods are thus much less adapted to the problem of computing geodesics, although they solve a class
+of similar problems.
 
 \paragraph{Fast Marching}
 For the fast marching algorithm, the method is much shorter, as it runs in $\mathcal{O}(\nv \log \nv)$, but
@@ -518,6 +574,17 @@ Care should be taken when interpreting the following results, as the runtime dep
 The number of vertices is not always a fair indicator of the complexity of the geometry, and other factors such as the distribution of vertex valences and curvature may also impact the practical runtime of the algorithm.
 
 \subsection{Runtime of linear PDE methods}
+
+\paragraph{Precision of Spectral Method}
+In Figure \ref{fig:spectral-approx} we present how well the approximation
+\begin{figure}[ht]
+	SCHPOUET
+	\caption{$\ell^{2}$ error of the spectral embedding on $k$ vectors to the full spectral embedding.
+		Average computed on most of our manifold examples, as a function of the percentage of the dimension
+		$\nv$ used for the embedding size.}
+	\label{fig:spectral-approx}
+\end{figure}
+
 \subsection{Runtime of Fast Marching}
 
 \subsection{Runtime of the ICH algorithm}
