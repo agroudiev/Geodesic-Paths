@@ -48,7 +48,6 @@
 \end{abstract}
 
 \begin{teaserfigure}
-	% on peut remplacer l'image par quelque chose de plus horizontal du même genre, ou mettre plusieurs images côte à côte
 	\centering
 	\includegraphics[height=5cm]{images/rabbit-paths.png}
 	\hspace{1cm}
@@ -567,6 +566,11 @@ Two main limitations of our implementation are worth mentioning: paths along the
 \label{sec:experiments}
 In this section, we present experiments and results obtained from our implementations of the heat method, fast marching, and the Improved Chen-Han algorithm.
 All methods being implemented from scratch in the same programming language (Rust), and optimized up to a similar level, we believe the comparison to be fairly representative of the practical performances of each algorithm.
+
+The code for all implementations, as well as the scripts to reproduce the experiments, is available at:
+\begin{center}
+	\href{https://github.com/agroudiev/Geodesic-Paths}{\texttt{https://github.com/agroudiev/Geodesic-Paths}}
+\end{center}
 
 \subsection{Methodology}
 We collected a set of \textcolor{red}{TODO: number} meshes of various sizes, ranging from \textcolor{red}{TODO: min} to \textcolor{red}{TODO: max} vertices.
