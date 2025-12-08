@@ -7,6 +7,8 @@
 \UseTblrLibrary{amsmath,booktabs,counter,diagbox,nameref,siunitx,varwidth,zref}
 \input{images/tikz3dheat}
 
+\usepackage{caption}
+
 \def\div{\mathrm{div}}
 \def\O{\mathcal{O}}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
@@ -162,8 +164,8 @@ Consider the parabolic heat equation
 	\frac{\d}{\d t}u_{t} = \Delta u_{t}.
 \end{equation*}
 Here, $u_{t}$ is the temperature profile at time $t$ and $\Delta$ is the Laplacian operator (or divergence of the gradient operator).
-However, on a piecewise-linear manifold, because functions on vertices are interpolated linearly to become
-functions on the manifold, the gradient is piecewise-constant and can be computed explicitly from the
+However, on a piecewise-linear (PL) manifold, because functions on vertices are interpolated linearly to
+become functions on the manifold, the gradient is piecewise-constant and can be computed explicitly from the
 values at each vertex.
 Consider a face $f \in \F$ with vertices $p_{i}, p_{j}, p_{k} \in \R^{3}$.
 Let $e_{1} = p_{j} - p_{i}$ and $e_{2} = p_{k} - p_{i}$.
@@ -186,7 +188,7 @@ The definition of the divergence then comes from the Gauss-Ostrogradski theorem 
 where $A_{i}$ is the Voronoi area associated with vertex $i$ and $\alpha_{e}^{f}$ is the angle at the vertex
 opposite to edge $e$ in $f$.
 
-Finally, we can define the Laplace-Beltrami operator (the piecewise-linear version of the continuous Laplacian) as $\Delta = (\nabla \cdot) \circ \nabla : \V \to \R$ or simply
+Finally, we can define the Laplace-Beltrami operator (the PL version of the continuous Laplacian) as $\Delta = (\nabla \cdot) \circ \nabla : \V \to \R$ or simply
 \begin{equation}
 	(\Delta u)_{i} = \frac{1}{2A_{i}}\sum_{e = (i, j)}\left(\cot \alpha_{i, j} + \cot \beta_{i, j}\right)\left(u_{i} - u_{j}\right),\label{eq:Laplacian}
 \end{equation}
@@ -265,15 +267,13 @@ This equation can be derived, for example, from the Maxwell equations to compute
 along a charge distribution, the equivalent theorems about gravitation, or from the momentum equation to
 compute the pressure in an incompressible fluid given its velocity.
 
-The Poisson equations we consider are the screened Poisson equation
+The Poisson equations we consider are the screened Poisson equation and the border Poisson equation
 \begin{equation*}
 	\begin{cases}
 		u                              & = 1 \text{ on } \partial M \\
 		\Delta u - \frac{1}{\rho^{2}}u & = 0 \text{ on } M
 	\end{cases}
-\end{equation*}
-and the border Poisson equation
-\begin{equation*}
+	\quad \text{ and } \quad
 	\begin{cases}
 		u        & = 0  \text{ on } \partial M \\
 		\Delta u & = -1 \text{ on } M
@@ -281,6 +281,7 @@ and the border Poisson equation
 \end{equation*}
 which both characterize a sense of distance $u$ to the border conditions $\partial M$ which in our case are
 the sources, the points we wish to consider distances to.
+This type of distance we call a border distance transform.
 
 \paragraph{Spectral Methods}\label{par:spectral}
 Like the previous class of equations, the spectral methods we will present below only allow to compute a
@@ -430,10 +431,12 @@ The distances are not interated according to paths along edges, but so that the 
 verified.
 If we know values $\phi_{i}, \phi_{j}$ at two corners, we pick $\phi_{k}$ so that the slope of the triangle
 $(i, j, k)$ for $\phi$ (so the norm of the gradient of $\phi$, $\left\lVert\nabla \phi\right\rVert$) is $1$
-as presented in the following figure.
-\begin{center}
+as presented in \autoref{fig:eikonal}.
+\begin{figure}
 	\input{images/fastmarching-gradient}
-\end{center}
+	\caption{Representation of the Eikonal equation \eqref{eq:eikonal} $\abs{\nabla \phi} = 1$ on a triangular face $(x_i, x_j, x_k)$ of a mesh.}
+	\label{fig:eikonal}
+\end{figure}
 A fun complement to the fast marching algorithm is that when the manifold is flat, i.e. when it is locally
 isometric to the Euclidean space, we return to the usual Dijkstra's algorithm.
 
@@ -665,6 +668,7 @@ and the algorithm thus runs in $\O(\nv\sqrt{\nv})$ which is still sub-quadratic.
 
 \subsection{Runtime of the ICH algorithm}
 Theoretically, the Improved Chen-Han algorithm runs in $\mathcal{O}(n^2 \log n)$ time on a mesh with $n$ vertices, which is worse than the $\mathcal{O}(n^2)$ previously obtained by the Chen-Han algorithm, the $\log n$ factor coming from the priority queue management.
+\todo{Overfull hbox}
 
 \cite{craneSurvey} reports that in practice, the ICH algorithm runs in sub-quadratic time on average, and dramatically improves the performance of the original Chen-Han algorithm, without supporting such a claim with a precise benchmark. We therefore conducted experiments to benchmark the practical runtime of our implementation of the ICH algorithm on various meshes, and report the results in \autoref{fig:ich-experiments-results}.
 
@@ -690,14 +694,14 @@ as well as their limitations and time complexities.
 \begin{table}[ht]
 	\begin{tblr}[expand=\intertitre]{%
 		rowspec={Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]},
-		colspec={Q[co=1,c]Q[co=1.5,mode=math,c]Q[mode=math,co=1,c]Q[co=1,c]Q[c, co=1.5]},
+		colspec={Q[co=1,c]Q[co=1.5,mode=math,c]Q[mode=math,co=1.5,c]Q[co=1,c]Q[c, co=1.5, cmd=\scriptsize]},
 		row{3, 5, 8}={bg=teal!20!white},
 				row{1}={c,cmd=\textbf,mode=text,fg=white,bg=teal},
 				colsep=3pt,
 				hline{-},
 				vline{1, 2, 6},
 			}%
-		Method        & Theoretical Runtime & Actual Runtime    & Precision & Limitations                                                     \\
+		Method        & Theoretical Runtime & Actual Runtime    & Precision & \small Limitations                                              \\
 		\intertitre{PDE-based methods}                                                                                                        \\
 		Heat          & \O(\nv^{3})         &                   & Approx.   & Stability, runtime, fixed sources, no paths                     \\
 		Poisson       & \O(\nv^{3})         &                   & Approx.   & Stability, not true geodesics, runtime, fixed sources, no paths \\
