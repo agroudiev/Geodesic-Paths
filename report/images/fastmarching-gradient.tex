@@ -1,3 +1,33 @@
-\begin{tikzpicture}
-	\node at (0, 0) {a};
+\usetikzlibrary{shadings}
+
+\begin{tikzpicture}[x={(1, -.2)},z={(.4, .5)},y={(0, 1)}]
+	\coordinate (origin) at (0, 0, 0);
+	\draw[canvas is xy plane at z=0, ->] (origin) -- +(0, 2) node[above] {$\phi(x)$};
+	\draw[canvas is xz plane at y=0] (origin) rectangle +(4, 4);
+	%
+	\coordinate[canvas is xz plane at y=0] (xi) at (.5, 0, 2.1);
+	\coordinate[canvas is xz plane at y=0] (xj) at (3, 0, .6);
+	\coordinate[canvas is xz plane at y=0] (xk) at (3.5, 0, 3.1);
+	% Draw the triangle
+	\fill[canvas is xz plane at y=0, thick, teal!50!purple!20!white] (xi) -- (xj) -- (xk) -- cycle;
+
+	% Draw circles at vertices
+	\fill (xi) circle (0.10) node[below left] {$x_i$};
+	\fill (xj) circle (0.10) node[below right] {$x_j$};
+	\fill (xk) circle (0.10) node[right] {$x_k$};
+	%
+	\coordinate[canvas is xz plane at y=0] (fxi) at ($(xi) + (0, .9, 0)$);
+	\coordinate[canvas is xz plane at y=0] (fxj) at ($(xj) + (0, .7, 0)$);
+	\coordinate[canvas is xz plane at y=0] (fxk) at ($(xk) + (0, 1.7, 0)$);
+	\fill (fxi) circle (0.10) node[left] {$\phi_i$};
+	\fill (fxj) circle (0.10) node[right] {$\phi_j$};
+	\fill (fxk) circle (0.10) node[above] {$\phi_k$};
+
+	\draw[dashed] (xi) -- (fxi) (xj) -- (fxj) (xk) -- (fxk);
+
+	\fill[top color=teal, bottom color=purple, opacity=.2] (fxj) -- (fxk) -- (fxi);
+
+	\fill ($(fxi)!1/3!(fxj)!1/3!(fxk)$) circle (0.1) node (bar) {};
+	\draw[->, thick] (bar) -- +(-0.133, 0.929, -0.345) node[left] {$\abs{\nabla\phi} = 1$};
+
 \end{tikzpicture}
