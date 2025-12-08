@@ -190,7 +190,7 @@ opposite to edge $e$ in $f$.
 
 Finally, we can define the Laplace-Beltrami operator (the PL version of the continuous Laplacian) as $\Delta = (\nabla \cdot) \circ \nabla : \V \to \R$ or simply
 \begin{equation}
-	(\Delta u)_{i} = \frac{1}{2A_{i}}\sum_{e = (i, j)}\left(\cot \alpha_{i, j} + \cot \beta_{i, j}\right)\left(u_{i} - u_{j}\right),\label{eq:Laplacian}
+	(\Delta u)_{i} = \frac{1}{2A_{i}}\sum_{e = (i, j)}\left(\cot \alpha_{i, j} + \cot \beta_{i, j}\right)\left(u_{i} - u_{j}\right),\label{eq:laplacian}
 \end{equation}
 where $\alpha_{i, j}, \beta_{i, j}$ are the two angles opposite edge $(i, j)$.
 One could then see the Laplace-Beltrami operator as a matrix $L \in \R^{\nv \times \nv}$.
@@ -370,7 +370,7 @@ down on impact).
 
 However, while retrieving distance information from Equations \eqref{eq:heat} and \eqref{eq:poisson} is
 not too difficult and doable by solving a simple linear system, retrieving distance from propagating
-wavefronts is more easily done from the non-linear hyperbolic eikonal equation
+wavefronts is more easily done from the non-linear hyperbolic Eikonal equation
 \begin{equation}
 	\begin{cases}
 		\abs{\nabla u}^{2} = 1 & \text{on } M,         \\
@@ -379,7 +379,7 @@ wavefronts is more easily done from the non-linear hyperbolic eikonal equation
 \end{equation}
 which directly characterizes the distance to the boundary $\partial M$ (which again in our case will be
 the set we're computing the distance to).
-The eikonal equation arises as the fundamental equation specifying the light paths in space given the
+The Eikonal equation arises as the fundamental equation specifying the light paths in space given the
 refractive index function of the media encountered.
 In our case, there is a unique medium to be considered, and light sources $\partial M$ that emit the light.
 
@@ -397,7 +397,7 @@ construct and solve a linear system of equations from the manifold and the set o
 	\item We compute the gradient for the manifold and a function $u$ using the formula of Equation
 	      \autoref{eq:facegrad}, as the dynamic array of the face vectors.
 	\item We also compute the Laplacian operator for the manifold as the $\nv \times \nv$ matrix using
-	      the cotangent formula of Equation \eqref{eq:Laplacian} by iterating on all faces to iterate
+	      the cotangent formula of Equation \eqref{eq:laplacian} by iterating on all faces to iterate
 	      on all edges and thus all vertices in the end.
 	\item If needed, we discretize in time the equation with a single step of backwards Euler method as done
 	      in Equation \eqref{eq:discrheat}.
@@ -421,21 +421,21 @@ distance for a given value of $k$.
 
 \subsubsection{Fast Marching Method}
 While the simple linear system solving works directly for the heat equation, solving for the geodesic paths
-arising from the eikonal equation \eqref{eq:eikonal} is more difficult, as the equation is non-linear, and
+arising from the Eikonal equation \eqref{eq:eikonal} is more difficult, as the equation is non-linear, and
 thus straightforward system resolution techniques will not work.
 
 To work around this issue, we implemented the fast marching algorithm, based on \cite{kimmelsethian}.
 The method initializes the distance at the sources $\partial M$ to $0$ and iterates using a priority queue
 on the neighbours of the already seen points.
-The distances are not interated according to paths along edges, but so that the eikonal equation is
+The distances are not interated according to paths along edges, but so that the Eikonal equation is
 verified.
 If we know values $\phi_{i}, \phi_{j}$ at two corners, we pick $\phi_{k}$ so that the slope of the triangle
 $(i, j, k)$ for $\phi$ (so the norm of the gradient of $\phi$, $\left\lVert\nabla \phi\right\rVert$) is $1$
-as presented in \autoref{fig:eikonal}.
+as presented in \autoref{fig:Eikonal}.
 \begin{figure}
 	\input{images/fastmarching-gradient}
 	\caption{Representation of the Eikonal equation \eqref{eq:eikonal} $\abs{\nabla \phi} = 1$ on a triangular face $(x_i, x_j, x_k)$ of a mesh.}
-	\label{fig:eikonal}
+	\label{fig:Eikonal}
 \end{figure}
 A fun complement to the fast marching algorithm is that when the manifold is flat, i.e. when it is locally
 isometric to the Euclidean space, we return to the usual Dijkstra's algorithm.
@@ -557,10 +557,7 @@ The Improved Chen-Han algorithm combines both approaches, using a priority queue
 	\label{fig:window-trimming}
 \end{figure}
 
-\subsection{Algorithm outline and example}
-We now give a high-level outline of the Improved Chen-Han algorithm, and illustrate it on a toy example.
-
-\textcolor{red}{TODO}
+We refer to \cite{xin2009improving} or to our implementation for details on the algorithm.
 
 
 \subsection{Implementation details}
@@ -620,7 +617,7 @@ visible on larger meshes.
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\linewidth]{images/heat_benchmark.pdf}
-	\caption{Benchmark of the time complexity of the \emph{Heat method} on various 3D meshes, as a function of the number of vertices.}
+	\caption{Benchmark of the time complexity of the \emph{Heat method} on various 3D meshes, as a function of the number of vertices. \textcolor{red}{TODO: add line to fit the second part}}
 	\Description{}
 	\label{fig:heat-experiments-results}
 \end{figure}
@@ -629,7 +626,7 @@ visible on larger meshes.
 In \autoref{fig:spectral-approx} we present how well the approximation using $k$ eigenvectors for the
 spectral embedding described in \autoref{par:spectral} and the different distance computations
 presented in Equation \eqref{eq:spectral} compares to the full precision using the full $n - 1$
-eigenvectors non associated to $0$ as an eigenvalue.
+eigenvectors non-associated to $0$ as an eigenvalue.
 
 The different colours represent the different methods and the different branches for each method are
 created from different models.
@@ -637,7 +634,8 @@ created from different models.
 	\includegraphics[width=\linewidth]{images/accuracy_spectral_methods.pdf}
 	\caption{$\ell^{2}$ error of the spectral embedding on $k$ vectors to the full spectral embedding.
 		Average computed on most of our manifold examples, as a function of the percentage of the dimension
-		$\nv$ used for the embedding size.}
+		$\nv$ used for the embedding size. \textcolor{red}{TODO: increase font size in figure (decrease figsize in matplotlib), decrease points size}}
+	\Description{}
 	\label{fig:spectral-approx}
 \end{figure}
 
@@ -667,8 +665,7 @@ and the algorithm thus runs in $\O(\nv\sqrt{\nv})$ which is still sub-quadratic.
 \end{figure}
 
 \subsection{Runtime of the ICH algorithm}
-Theoretically, the Improved Chen-Han algorithm runs in $\mathcal{O}(n^2 \log n)$ time on a mesh with $n$ vertices, which is worse than the $\mathcal{O}(n^2)$ previously obtained by the Chen-Han algorithm, the $\log n$ factor coming from the priority queue management.
-\todo{Overfull hbox}
+Theoretically, the Improved Chen-Han algorithm's time complexity is $\mathcal{O}(n^2 \log n)$ on a mesh with $n$ vertices, which is worse than the $\mathcal{O}(n^2)$ previously obtained by the Chen-Han algorithm, the $\log n$ factor coming from the priority queue management.
 
 \cite{craneSurvey} reports that in practice, the ICH algorithm runs in sub-quadratic time on average, and dramatically improves the performance of the original Chen-Han algorithm, without supporting such a claim with a precise benchmark. We therefore conducted experiments to benchmark the practical runtime of our implementation of the ICH algorithm on various meshes, and report the results in \autoref{fig:ich-experiments-results}.
 
@@ -706,19 +703,20 @@ as well as their limitations and time complexities.
 		Heat          & \O(\nv^{3})         &                   & Approx.   & Stability, runtime, fixed sources, no paths                     \\
 		Poisson       & \O(\nv^{3})         &                   & Approx.   & Stability, not true geodesics, runtime, fixed sources, no paths \\
 		Spectral      & \O(\nv^{3})         &                   & Approx.   & Stability, not true geodesics, runtime, no paths                \\
-		Fast Marching & \O(\nv\log \nv)     & \O(\nv\sqrt{\nv}) & Approx.   & Fixed sources, limited meshes, no paths                         \\
+		Fast Marching & \O(\nv\log \nv)     & \O(\nv^{1.5}) & Approx.   & Fixed sources, limited to meshes, no paths                         \\
 		\intertitre{Computational geometry methods}                                                                                           \\
-		ICH           & \O(\nv^{2}\log \nv) & \O(\nv^{1.6})     & Exact     & Limited meshes \textcolor{red}{\@ antoine vérifie stp}
+		ICH           & \O(\nv^{2}\log \nv) & \O(\nv^{1.6})     & Exact     & Limited to meshes, fixed (but possibly non-edge) sources
 	\end{tblr}
 	\caption{Summary table comparing the different methods, their limitations and time complexity}
 	\label{tab:summary}
 \end{table}
 
 We see in the table that two methods stand out: the Fast-Marching algorithm and the
-Improved Chen-Han algorithm which both run in around $\O(\nv^{1.5})$ time in practice.
+Improved Chen-Han algorithm, both running in around $\O(\nv^{1.5})$ time in practice.
 However, while the fast marching algorithm only allows to compute the distance from a fixed set of sources,
 the Improved Chen-Han algorithm computes all distances with better precision at the cost of a higher
 theoretical runtime, which in practice does not matter when pruning is done properly.
+It is also worth noting that ICH is the only algorithm to natively support path reconstruction; this can be done for some PDE-based methods at the cost of additional work. \todo{\@ matthieu tu peux préciser ça si besoin}
 
 \section*{Conclusion}
 In this report, we investigated different methods to compute shortest-paths on meshed $2$-manifolds embedded in $\R^{3}$.
