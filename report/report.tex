@@ -8,7 +8,7 @@
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
 \bibliographystyle{alpha}
-\title[Geodesic Paths and Distances]{Geodesic Paths and Distances\texorpdfstring{\\{\normalsize Report on \textit{A Survey of Algorithms for Geodesic Paths and Distances}}}{}}
+\title[Geodesic Paths and Distances on Meshes]{Geodesic Paths and Distances on Meshes: PDE and Computational Geometry Approaches\texorpdfstring{\\{\normalsize Report on \textit{A Survey of Algorithms for Geodesic Paths and Distances}}}{}}
 
 
 \author{Matthieu Pierre Boyer}
@@ -63,9 +63,7 @@
 \maketitle
 
 \section*{Introduction}
-Computing the distance between two points and retrieving a shortest path is, in general, a fundamental problem in computer science. While the problem is well understood in flat, Euclidean spaces, it becomes more challenging when considering curved surfaces.
-
-\textcolor{red}{TODO: mathematical problem formulation in general}
+Computing the distance between two points and retrieving a shortest path is, in general, a fundamental problem in computer science. While the problem is well understood in flat, Euclidean spaces, it becomes more challenging when considering curved surfaces. Indeed, the geodesic distance between two points on a surface is defined as the length of the shortest path that lies entirely on the surface. Computing such distances and paths is a non-trivial task, even when the surface is represented as a discrete mesh.
 
 Such a problem arises in various fields, including computer graphics, robotics, medical imaging, and computer vision. In computer graphics, geodesic distances are used for texture mapping \cite{oliveira2010geotextures}; in robotics, they form the cornerstone of path planning algorithms on complex terrains \cite{garrido2013application}; in medical imaging, they assist in analyzing anatomical structures \cite{miller2006geodesic}; and in computer vision, they improve object recognition and shape analysis \cite{shamai2017geodesic}.
 
@@ -79,7 +77,7 @@ Finally, we present experiments and results in \autoref{sec:experiments}, and co
 \label{sec:math-reminders}
 Formally, a $2$-manifold (without boundary) is a topological space in which all points have neighborhoods
 homeomorphic to disks (without boundary) in $\R^{2}$.
-Such an homeomorphism is called a chart.
+Such a homeomorphism is called a chart.
 Intuitively, this means that zooming enough on any point of the manifold will make it look like a flat surface.
 In \autoref{fig:manifolds-examples}, we can see that some meshes are not manifolds, as some points are locally non-flat.
 
@@ -429,24 +427,22 @@ $(i, j, k)$ for $\phi$ (so the norm of the gradient of $\phi$, $\left\lVert\nabl
 The main issue that arises with the linear PDEs we consider is numerical stability.
 Indeed, the laplacian of a manifold will usually be singular, so we need to add regularization terms at
 every linear system resolution.
-This yields a lot of numerical artifact when the discretization steps are too big for the precision we
+This yields a lot of numerical artifacts when the discretization steps are too big for the precision we
 can compute.
 Moreover, while the method is polynomial, it scales quite poorly as the number of vertices increases, the
 algorithm being in $\mathcal{O}(\nv^{3})$.
 
 \paragraph{Spectral and Poisson Methods}
-Some of the issues that arise with those methods have already been described above, because they are all
-based on the quite slow solving of linear systems, but the main issue with those methods is that they only
-allow to describe some distance transform from sources/some distance transform on the step.
-Those methods are thus much less adapted to the problem of computing geodesics, although they solve a class
-of similar problems.
+Some of the issues that arise with those methods are similar to those described above, as they are all based on the linear system solving, a slow process.
+However, the main issue with those methods is that they only allow to describe some distance transform from sources or some distance transform on the step.
+Those methods are thus much less adapted to the problem of computing geodesics, although they solve a similar class of problems.
 
 \paragraph{Fast Marching}
 For the fast marching algorithm, the method is much shorter, as it runs in $\mathcal{O}(\nv \log \nv)$, but
 this comes at the cost of stability when considering too small angles.
 Indeed, the order in which vertices are updated might violate the causality property of the propagation.
-Indeed, if triangles have obtuse angles, there might be point $i$ being closer to the source than another
-point $j$ but the distance in $j$ might be finalized before the distance at $i$.
+If triangles have obtuse angles, there might exist a point $i$ that is closer to the source than another
+point $j$, but the distance in $j$ might be finalized before the distance at $i$.
 A solution to this exists but might not terminate due to its non-locality.
 
 \section{Computational Geometry methods}
