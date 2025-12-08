@@ -3,7 +3,7 @@
 \usepackage[textsize=small]{todonotes}
 \usepackage{subcaption}
 \usetikzlibrary{3d, arrows.meta, positioning}
-\input{acmart/tikz3dheat}
+\input{images/tikz3dheat}
 
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
@@ -226,9 +226,12 @@ It can be derived from the first principle of thermodynamics on infinitesimal sl
 describes the fact that spatial variations of temperature spread quadratically with regard to time.
 This means that spreading temperature from point A to point B will take of the order of magnitude of the
 square of the distance between A and B.
-\begin{center}
+\begin{figure}[H]
+	\centering
 	\input{images/heat-equation}
-\end{center}
+	\caption{Illustration of the heat propagation between two slices of material of temperatures $T_2$ and $T_1$.}
+	\Description{}
+\end{figure}
 
 We can discretize the heat equation in time as
 \begin{equation}
@@ -298,10 +301,10 @@ some transform of the eigenvalues $\lambda_{i}$ multiplied by the squared $\ell^
 embeddings $\left(\psi_{i}(x) - \psi_{i}(y)\right)^{2}$:
 \begin{equation*}
 	\begin{array}{rccl}
-		(eigenmap)     & \phi_{E}^{2}(x, y) & = & \sum_{i = 1}^{k} \abs{\psi_{i}(x) - \psi_{i}(y)}^{2}                          \\
-		(commute time) & \phi_{C}^{2}(x, y) & = & \sum_{i = 1}^{k} \frac{1}{\lambda_{i}}\abs{\psi_{i}(x) - \psi_{i}(y)}^{2}     \\
-		(biharmonic)   & \phi_{B}^{2}(x, y) & = & \sum_{i = 1}^{k} \frac{1}{\lambda_{i}^{2}}\abs{\psi_{i}(x) - \psi_{i}(y)}^{2} \\
-		(diffusion)    & \phi_{D}^{2}(x, y) & = & \sum_{i = 1}^{k} e^{-2t\lambda_{k}} \abs{\psi_{i}(x) - \psi_{i}(y)}^{2}       \\
+		\text{(eigenmap)}     & \phi_{E}^{2}(x, y) & = & \sum_{i = 1}^{k} \abs{\psi_{i}(x) - \psi_{i}(y)}^{2}                          \\
+		\text{(commute time)} & \phi_{C}^{2}(x, y) & = & \sum_{i = 1}^{k} \frac{1}{\lambda_{i}}\abs{\psi_{i}(x) - \psi_{i}(y)}^{2}     \\
+		\text{(biharmonic)}   & \phi_{B}^{2}(x, y) & = & \sum_{i = 1}^{k} \frac{1}{\lambda_{i}^{2}}\abs{\psi_{i}(x) - \psi_{i}(y)}^{2} \\
+		\text{(diffusion)}    & \phi_{D}^{2}(x, y) & = & \sum_{i = 1}^{k} e^{-2t\lambda_{k}} \abs{\psi_{i}(x) - \psi_{i}(y)}^{2}       \\
 	\end{array}
 \end{equation*}
 
