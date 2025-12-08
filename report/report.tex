@@ -573,16 +573,28 @@ The code for all implementations, as well as the scripts to reproduce the experi
 \end{center}
 
 \subsection{Methodology}
-We collected a set of \textcolor{red}{TODO: number} meshes of various sizes, ranging from \textcolor{red}{TODO: min} to \textcolor{red}{TODO: max} vertices.
+We collected a set of 27 meshes of various sizes, ranging from 4 to 125'066 vertices.
 Mesh come from various sources, including the Thingi10k dataset \cite{zhou2016thingi10kdataset100003dprinting}, filtered to only contain manifolds with a single connected component.
 Each mesh was processed by our implementation of each method, starting from a single source vertex chosen arbitrarily.
-For each mesh, each algorithm is run \textcolor{red}{TODO: number} times with different source vertices, each point corresponding to the average runtime over these runs.
+For each mesh, each algorithm is run 10 times with different source vertices, each point corresponding to the average runtime over these runs.
 All experiments were conducted on a MacBook Pro with a 3.22 GHz Apple M1 Pro chip and 32GB of RAM.
+Plots are presented on a log-log scale, and when appropriate, a linear regression is fitted to the data points to estimate the practical time complexity of each method.
 
 Care should be taken when interpreting the following results, as the runtime depends on the specific geometry of the meshes used in the benchmark, and may not generalize to all possible meshes.
 The number of vertices is not always a fair indicator of the complexity of the geometry, and other factors such as the distribution of vertex valences and curvature may also impact the practical runtime of the algorithm.
 
-\subsection{Runtime of linear PDE methods}
+\subsection{Benchmarking of linear PDE methods}
+\paragraph{Runtime of the Heat Method}
+\textcolor{red}{TODO: explain theoretical runtime}
+In Figure \ref{fig:heat-experiments-results}, we present the results of our benchmark of the practical runtime of the heat method on various meshes. We do not observe a clear linear trend in log-log scale as a function of the number of vertices on the selected range of sizes. We believe this is due to the overhead of \textcolor{red}{TODO} for small meshes, and that the asymptotic behavior would be more visible on larger meshes.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\linewidth]{images/heat_benchmark.pdf}
+	\caption{Benchmark of the time complexity of the \emph{Heat method} on various 3D meshes, as a function of the number of vertices.}
+	\Description{}
+	\label{fig:heat-experiments-results}
+\end{figure}
 
 \paragraph{Precision of Spectral Method}
 In Figure \ref{fig:spectral-approx} we present how well the approximation
@@ -595,6 +607,14 @@ In Figure \ref{fig:spectral-approx} we present how well the approximation
 \end{figure}
 
 \subsection{Runtime of Fast Marching}
+\textcolor{red}{TODO: explain theoretical runtime}
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\linewidth]{images/fastmarching_benchmark.pdf}
+	\caption{Benchmark of the time complexity of the \emph{Fast Marching algorithm} on various 3D meshes, as a function of the number of vertices. Slope: $1.51$, $r^2$: $0.98$.}
+	\Description{}
+	\label{fig:fastmarching-experiments-results}
+\end{figure}
 
 \subsection{Runtime of the ICH algorithm}
 Theoretically, the Improved Chen-Han algorithm runs in $\mathcal{O}(n^2 \log n)$ time on a mesh with $n$ vertices, which is worse than the $\mathcal{O}(n^2)$ previously obtained by the Chen-Han algorithm, the $\log n$ factor coming from the priority queue management.
@@ -604,7 +624,7 @@ Theoretically, the Improved Chen-Han algorithm runs in $\mathcal{O}(n^2 \log n)$
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\linewidth]{images/ich_benchmark.pdf}
-	\caption{\textcolor{red}{TODO: consider putting this in two columns} Benchmark of the time complexity of the ICH algorithm on various 3D meshes, as a function of the number of vertices. Slope: $1.60$, $r^2$: $0.96$.}
+	\caption{Benchmark of the time complexity of the \emph{ICH algorithm} on various 3D meshes, as a function of the number of vertices. Slope: $1.60$, $r^2$: $0.96$.}
 	\Description{}
 	\label{fig:ich-experiments-results}
 \end{figure}
