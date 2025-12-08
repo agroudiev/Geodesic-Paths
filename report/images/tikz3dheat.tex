@@ -1,0 +1,22 @@
+\pgfkeys{tikz/.cd,
+box color/.code={\xdef\tkzThreedBoxColor{#1}},
+box color=white
+}
+\def\parsexy(#1,#2,#3){(#1,#2)}
+\def\parsexz(#1,#2,#3){(#1,#3)}
+\def\parseyz(#1,#2,#3){(#2,#3)}
+\def\parsex(#1,#2,#3){#1}
+\def\parsey(#1,#2,#3){#2}
+\def\parsez(#1,#2,#3){#3}
+
+\newcommand{\tkzThreeDBox}[5][white]{\tikzset{#1}
+\edef\temp{%
+\noexpand\filldraw[#1,fill=\tkzThreedBoxColor!40,canvas is yz plane at x=\parsex#3+\parsex#2] 
+\parseyz#2 rectangle (\parsey#4+\parsey#2,\parsez#5+\parsez#2);
+\noexpand\filldraw[#1,fill=\tkzThreedBoxColor!30,canvas is xz plane at y=\parsey#4+\parsey#2] 
+\parsexz#2 rectangle (\parsex#3+\parsex#2,\parsez#5+\parsez#2);
+\noexpand\filldraw[#1,fill=\tkzThreedBoxColor!50,canvas is xy plane at z=\parsez#5+\parsez#2] 
+\parsexy#2 rectangle (\parsex#3+\parsex#2,\parsey#4+\parsey#2);
+}
+\temp
+}
