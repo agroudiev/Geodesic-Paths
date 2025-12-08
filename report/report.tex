@@ -43,7 +43,8 @@
 	on meshed $2$-manifolds embedded in $\R^{3}$, based on \cite{craneSurvey}.
 	We will most notably compare different types of methods, either coming from
 	the resolution of PDEs on the manifold, or through the unfolding of the embedding to $\R^{2}$.
-	We also provide from-scratch implementations of three methods, namely the heat method, fast marching, and the Improved Chen-Han algorithm, and compare their performances on several datasets.
+	We also provide from-scratch implementations of \textcolor{red}{TODO} methods, namely the heat method, fast marching, and the Improved Chen-Han algorithm, and compare their performances on several datasets.
+	\todo{list all methods}
 	% for a blazingly fast™ result.
 \end{abstract}
 
@@ -63,13 +64,14 @@
 \maketitle
 
 \section*{Introduction}
-Computing the distance between two points and retrieving a shortest path is, in general, a fundamental problem in computer science. While the problem is well understood in flat, Euclidean spaces, it becomes more challenging when considering curved surfaces. Indeed, the geodesic distance between two points on a surface is defined as the length of the shortest path that lies entirely on the surface. Computing such distances and paths is a non-trivial task, even when the surface is represented as a discrete mesh.
+Computing the distance between two points and retrieving a shortest path is, in general, a fundamental problem in computer science. While the problem is well understood in flat, Euclidean spaces, as well as on graphs, it becomes more challenging when considering curved surfaces. Indeed, the geodesic distance between two points on a surface is defined as the length of the shortest path that lies entirely on the surface. Computing such distances and paths is a non-trivial task, even when the surface is represented as a discrete mesh.
 
 Such a problem arises in various fields, including computer graphics, robotics, medical imaging, and computer vision. In computer graphics, geodesic distances are used for texture mapping \cite{oliveira2010geotextures}; in robotics, they form the cornerstone of path planning algorithms on complex terrains \cite{garrido2013application}; in medical imaging, they assist in analyzing anatomical structures \cite{miller2006geodesic}; and in computer vision, they improve object recognition and shape analysis \cite{shamai2017geodesic}.
 
 The ability to efficiently compute geodesic distances and paths is therefore crucial for many applications in which the size of the problem is large, and where real-time performance is required. In the polyhedral setting, where the surface is represented as a mesh of vertices, edges, and faces, the number of vertices is derived from the desired accuracy of the representation, and can thus be very large. Algorithms with a low theoretical and practical complexity are therefore essential to handle such large-scale problems.
 
-After brief mathematical reminders in \autoref{sec:math-reminders}, we present two methods based on the resolution of Partial Differential Equations (PDEs) in \autoref{sec:pde-methods}.
+After brief mathematical reminders in \autoref{sec:math-reminders}, we present \textcolor{red}{TODO} methods based on the resolution of Partial Differential Equations (PDEs) in \autoref{sec:pde-methods}.
+\todo{number of methods}
 Then, in \autoref{sec:comp-geom-methods}, we discuss computational geometry methods, focusing on the Improved Chen-Han algorithm.
 Finally, we present experiments and results in \autoref{sec:experiments}, and conclude in the final section.
 
@@ -90,7 +92,7 @@ In \autoref{fig:manifolds-examples}, we can see that some meshes are not manifol
 	\label{fig:manifolds-examples}
 \end{figure}
 
-When considering a $2$-manifold $M$, a (smooth) curve is a (smooth) application $\gamma: I \to M$.
+When considering a $2$-manifold $M$, a (smooth) curve is a (smooth) application $\gamma: I \to M$ for an interval $I$.
 Two curves $\gamma_{1}, \gamma_{2}$ on the same interval $(-\epsilon, \epsilon)$ based at
 $q = \gamma_{1}(0) = \gamma_{2}(0)$ are equivalent if, in some chart, they have same first Taylor expansion
 around $0$.
@@ -137,6 +139,8 @@ The quality of the approximation by the mesh of the $2$-manifold will never be t
 quality results.
 Finding the best approximation of a curved surface by a mesh is a whole other problem that we will not address in this report.
 
+We now present two classes of methods to compute such geodesic paths and distances on a mesh.
+
 \section{PDE-based methods}
 \label{sec:pde-methods}
 In this section we will study methods inspired by Partial Differential Equations (PDE) that arise from models
@@ -149,7 +153,7 @@ Consider the parabolic heat equation
 \begin{equation*}
 	\frac{\d}{\d t}u_{t} = \Delta u_{t}.
 \end{equation*}
-Here, $u_{t}$ is the temperature profile at time $t$ and $\Delta$ is the laplacian operator (or divergence of the gradient operator).
+Here, $u_{t}$ is the temperature profile at time $t$ and $\Delta$ is the Laplacian operator (or divergence of the gradient operator).
 However, on a piecewise-linear manifold, because functions on vertices are interpolated linearly to become
 functions on the manifold, the gradient is piecewise-constant and can be computed explicitly from the
 values at each vertex.
@@ -174,9 +178,9 @@ The definition of the divergence then comes from the Gauss-Ostrogradski theorem 
 where $A_{i}$ is the Voronoi area associated with vertex $i$ and $\alpha_{e}^{f}$ is the angle at the vertex
 opposite to edge $e$ in $f$.
 
-Finally, we can define the Laplace-Beltrami operator (the piecewise-linear version of the continuous laplacian) as $\Delta = (\nabla \cdot) \circ \nabla : \V \to \R$ or simply
+Finally, we can define the Laplace-Beltrami operator (the piecewise-linear version of the continuous Laplacian) as $\Delta = (\nabla \cdot) \circ \nabla : \V \to \R$ or simply
 \begin{equation}
-	(\Delta u)_{i} = \frac{1}{2A_{i}}\sum_{e = (i, j)}\left(\cot \alpha_{i, j} + \cot \beta_{i, j}\right)\left(u_{i} - u_{j}\right),\label{eq:laplacian}
+	(\Delta u)_{i} = \frac{1}{2A_{i}}\sum_{e = (i, j)}\left(\cot \alpha_{i, j} + \cot \beta_{i, j}\right)\left(u_{i} - u_{j}\right),\label{eq:Laplacian}
 \end{equation}
 where $\alpha_{i, j}, \beta_{i, j}$ are the two angles opposite edge $(i, j)$.
 One could then see the Laplace-Beltrami operator as a matrix $L \in \R^{\nv \times \nv}$.
@@ -196,18 +200,17 @@ and integrated to find shortest paths.
 
 \smallskip
 
-The following equations all implicate the Laplace-Beltrami operator (or laplacian operator $\Delta$) which
+The following equations all rely on the Laplace-Beltrami operator (or Laplacian operator $\Delta$) which
 models the sum of second-order derivatives along each axis of a function.
 It is not difficult to understand how such an operator can mimic the propagation of a phenomenon in space.
-Indeed, the laplacian of $u$ at $x$ measures the average extent of the deviation from the value of $u$ near
+Indeed, the Laplacian of $u$ at $x$ measures the average extent of the deviation from the value of $u$ near
 $x$ to the value of $u$ at $x$.
 As such, when we consider systems in which some quantity at a point is influenced by the value of the same
-quantity at nearby points (possibly with a time deviation), the laplacian naturally occurs.
-Adding this to the symmetry at the core of the Laplacian's definition (in a local coordinate frame), it is
-bound to appear when moreover the laws of deviation are symmetric, which is often the case in physics.
-From a more mathematical point of view, the laplacian is the first scalar linear differential operator
+quantity at nearby points (possibly with a time deviation), the Laplacian naturally occurs.
+Adding this to the symmetry at the core of the Laplacian's definition (in a local coordinate frame), when the laws of deviation are symmetric, which is often the case in physics, the Laplacian is bound to appear.
+From a more mathematical point of view, the Laplacian is the first scalar linear differential operator
 being covariant\footnote{Considering the linear category of differential operators between tensor fields,
-	we can prove that the laplacian is generated by the covariant derivative\footnote{Which in Riemannian
+	we can prove that the Laplacian is generated by the covariant derivative\footnote{Which in Riemannian
 		geometry is just the derivative along a vector adjusted to respect the Riemannian tensor metric of the
 		manifold.}.}, and is fundamental as such.
 
@@ -218,7 +221,7 @@ This method is based on the heat equation
 \end{equation}
 which models the
 evolution of temperature profiles $u_{t}$ in time in a given material, which here will be our surface,
-from the initial profil $u_{0}$.
+from the initial profile $u_{0}$.
 It can be derived from the first principle of thermodynamics on infinitesimal slices of material and
 describes the fact that spatial variations of temperature spread quadratically with regard to time.
 This means that spreading temperature from point A to point B will take of the order of magnitude of the
@@ -273,8 +276,8 @@ the sources, the points we wish to consider distances to.
 
 \paragraph{Spectral Methods}
 Like the previous class of equations, the spectral methods we will present below only allow to compute a
-sense of distance on the manifold, which is however not the geodesic distance on the embedding in $\R^{3}$.
-However, unlike the previous methods, it will allow us to compute distances between every pair of points
+sense of distance on the manifold, which is not the geodesic distance on the embedding in $\R^{3}$.
+However, unlike the previous methods, it will allow us to compute distances between every pair of points,
 and not simply from a set of sources.
 
 The idea is to use the eigenvectors and eigenvalues of the Laplace-Beltrami operator $\Delta$ to create
@@ -291,7 +294,7 @@ is concerned with the function at vertex $i$, we embed vertex $i$ to the vector 
 of $\psi_{1}, \ldots, \psi_{k}$.
 
 \cite{belkin2003eigenmaps} argue that this embedding minimizes the $\ell^{2}$ norm of the distortion when
-considering embeddings with eigenvectors of the laplacian. We then simply need to define the notion of
+considering embeddings with eigenvectors of the Laplacian. We then simply need to define the notion of
 distance we want to consider on this embedding.
 We implemented multiple proposals to compute $\phi^{2}(x, y)$, which are basically all the sum of
 some transform of the eigenvalues $\lambda_{i}$ multiplied by the squared $\ell^{2}$ difference of the
@@ -327,19 +330,19 @@ traffic into account, as it allows for multiple-route distance diminishment, as 
 
 \smallskip
 
-Similarly, the biharmonic distance arises from the equivalent definition when considering the bi-laplacian
+Similarly, the biharmonic distance arises from the equivalent definition when considering the bi-Laplacian
 $\Delta^{2}$ which has the same exact eigenvectors but with squared eigenvalues.
 Those two distances can also be defined using a diffusion process (similarly to the equations in the
 previous paragraphs), as the expected value of the first arrival at $y$ of a random walk on the mesh
 starting at $x$.
-For the diffusion distance, the discrete diffusion process used for definition is simply considering the
-amount of information that has been diffused from $x$ to $y$ and from $y$ to $x$ at time $t$ and is
-directly tied to the heat equation as such.
+For the diffusion distance, the discrete diffusion process used in the definition only considers the
+amount of information that has been diffused from $x$ to $y$ and from $y$ to $x$ at time $t$, and is as such
+directly tied to the heat equation.
 
 \smallskip
 
 As said, these methods do not contain the geodesics, but may be used as good approximations of the geodesic
-distance (or for their proper interpretation) as regularized versions of the geodesic distance.
+distance, or as regularized versions of the geodesic distance.
 Moreover, when considering $k$ much smaller than $\nv$, it is easy to approximate the distance quite well
 (see Figure \ref{fig:spectral-approx} below).
 
@@ -384,8 +387,8 @@ construct and solve a linear system of equations from the manifold and the set o
 \begin{itemize}
 	\item We compute the gradient for the manifold and a function $u$ using the formula of Equation
 	      \ref{eq:facegrad}, as the dynamic array of the face vectors.
-	\item We also compute the laplacian operator for the manifold as the $\nv \times \nv$ matrix using
-	      the cotangent formula of Equation \eqref{eq:laplacian} by iterating on all faces to iterate
+	\item We also compute the Laplacian operator for the manifold as the $\nv \times \nv$ matrix using
+	      the cotangent formula of Equation \eqref{eq:Laplacian} by iterating on all faces to iterate
 	      on all edges and thus all vertices in the end.
 	\item If needed, we discretize in time the equation with a single step of backwards Euler method as done
 	      in Equation \eqref{eq:discrheat}.
@@ -400,15 +403,15 @@ and iterating on the faces to fill the divergence matrix of the manifold and sol
 
 \smallskip
 
-For the spectral methods, we compute the laplacian matrix in the same fashion as above, and compute its
+For the spectral methods, we compute the Laplacian matrix in the same fashion as above, and compute its
 eigenspaces (as eigenvalues and eigenvectors).
 We then sort those by increasing eigenvalues, skip the first one and compute the approximate geodesic
 distance for a given value of $k$.
 
 \subsubsection{Fast Marching Method}
 While the simple linear system solving works directly for the heat equation, solving for the geodesic paths
-arising from the eikonal equation \eqref{eq:eikonal} is more difficult, as the equation is non-linear and
-thus easy system resolution techniques will not work.
+arising from the eikonal equation \eqref{eq:eikonal} is more difficult, as the equation is non-linear, and
+thus straightforward system resolution techniques will not work.
 
 To work around this issue, we implemented the fast marching method, based on \cite{kimmelsethian}.
 The method initializes the distance at the sources $\partial M$ to $0$ and iterates using a priority queue
@@ -425,7 +428,7 @@ $(i, j, k)$ for $\phi$ (so the norm of the gradient of $\phi$, $\left\lVert\nabl
 \subsubsection{Limitations}
 \paragraph{Linear PDEs}
 The main issue that arises with the linear PDEs we consider is numerical stability.
-Indeed, the laplacian of a manifold will usually be singular, so we need to add regularization terms at
+Indeed, the Laplacian of a manifold will usually be singular, so we need to add regularization terms at
 every linear system resolution.
 This yields a lot of numerical artifacts when the discretization steps are too big for the precision we
 can compute.
@@ -435,15 +438,15 @@ algorithm being in $\mathcal{O}(\nv^{3})$.
 \paragraph{Spectral and Poisson Methods}
 Some of the issues that arise with those methods are similar to those described above, as they are all based on the linear system solving, a slow process.
 However, the main issue with those methods is that they only allow to describe some distance transform from sources or some distance transform on the step.
-Those methods are thus much less adapted to the problem of computing geodesics, although they solve a similar class of problems.
+Those methods are thus not as well adapted to the problem of computing geodesics, although they solve a similar class of problems.
 
 \paragraph{Fast Marching}
 For the fast marching algorithm, the method is much shorter, as it runs in $\mathcal{O}(\nv \log \nv)$, but
-this comes at the cost of stability when considering too small angles.
+this comes at the cost of stability when considering angles that are too small.
 Indeed, the order in which vertices are updated might violate the causality property of the propagation.
 If triangles have obtuse angles, there might exist a point $i$ that is closer to the source than another
 point $j$, but the distance in $j$ might be finalized before the distance at $i$.
-A solution to this exists but might not terminate due to its non-locality.
+A solution to this exists but might not terminate due to its non-locality.\todo{référence de ça?}
 
 \section{Computational Geometry methods}
 \label{sec:comp-geom-methods}
@@ -560,7 +563,7 @@ Two main limitations of our implementation are worth mentioning: paths along the
 
 \section{Experiments and results}
 \label{sec:experiments}
-In this section, we present experiments and results obtained from our implementations of the heat method, fast marching, and the Improved Chen-Han algorithm.
+In this section, we present experiments and results obtained from our implementations of the heat method, fast marching, and the Improved Chen-Han algorithm.\todo{add other methods}
 All methods being implemented from scratch in the same programming language (Rust), and optimized up to a similar level, we believe the comparison to be fairly representative of the practical performances of each algorithm.
 
 The code for all implementations, as well as the scripts to reproduce the experiments, is available at:
