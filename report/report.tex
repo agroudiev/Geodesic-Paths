@@ -358,7 +358,7 @@ Moreover, when considering $k$ much smaller than $\nv$, it is easy to approximat
 \paragraph{Wavefront Propagation}
 The hyperbolic wavefront propagation equation (or d'Alembert equation)
 \begin{equation*}
-	\frac{\d^{2}}{\d t^{2}}u_{t} = c^{2}\Delta u_{t}, \text{or}, \square u = 0
+	\frac{\d^{2}}{\d t^{2}}u_{t} = c^{2}\Delta u_{t}, \text{ or }, \square u = 0
 \end{equation*}
 where $\square$ is the d'Alembert operator, models the propagation of a wave in a material,
 which will again be our surface here.
@@ -603,14 +603,17 @@ Care should be taken when interpreting the following results, as the runtime dep
 The number of vertices is not always a fair indicator of the complexity of the geometry, and other factors such as the distribution of vertex valences and curvature may also impact the practical runtime of the algorithm.
 
 \subsection{Benchmarking of linear PDE methods}
-\paragraph{Runtime of the Heat Method}
+\paragraph{Runtime of the linear PDE methods}
 In \autoref{fig:heat-experiments-results}, we present the results of our benchmark of the practical
 runtime of the heat method on various meshes.
-In theory, the method computes the laplacian in $\O(\nv^{2})$ then solves two linear systems in $\O(n^{3})$.However, we do not observe a clear linear trend in log-log scale as a function of the number of vertices
+In theory, the method computes the laplacian in $\O(\nv^{2})$ then solves two linear systems in
+about $\O(n^{\omega})$ the matrix multiplication complexity (in practice, we should have $\omega \leq \log_{2}(7) = 2.83$ but not much smaller).
+However, we do not observe a clear linear trend in log-log scale as a function of the number of vertices
 on the selected range of sizes.
 We believe this is due to the overhead of face-gradient, divergence and laplacian operators computation for
-small meshes, which takes a lot of added operations, and that the asymptotic behavior would be more
-visible on larger meshes.
+small meshes, which takes a lot of added operations, as well as the overhead in the complexity constant
+hidden in the big O notation that the most asymptotically efficient algorithms for matrix multiplication
+and system solving induce and that the asymptotic behavior would be more visible on larger meshes.
 
 \begin{figure}[ht]
 	\centering
@@ -620,7 +623,12 @@ visible on larger meshes.
 	\label{fig:heat-experiments-results}
 \end{figure}
 
-\paragraph{Precision of Spectral Method}
+Note that the theoretical complexity of the other linear system solving based methods (the Poisson based
+methods and the spectral decomposition methods) are similar to the heat method, as we have a big overhead
+considering the computation of laplacians and resolution of linear system then a few linear time
+computations.
+
+\paragraph{Precision of the Spectral Method}
 In \autoref{fig:spectral-approx} we present how well the approximation using $k$ eigenvectors for the
 spectral embedding described in \autoref{par:spectral} and the different distance computations
 presented in Equation \eqref{eq:spectral} compares to the full precision using the full $n - 1$
@@ -632,7 +640,7 @@ created from different models.
 	\includegraphics[width=\linewidth]{images/accuracy_spectral_methods.pdf}
 	\caption{$\ell^{2}$ error of the spectral embedding on $k$ vectors to the full spectral embedding.
 		Average computed on most of our manifold examples, as a function of the percentage of the dimension
-		$\nv$ used for the embedding size. \textcolor{red}{TODO: increase font size in figure (decrease figsize in matplotlib), decrease points size}}
+		$\nv$ used for the embedding size. \textcolor{red}{TODO: \@ antoine ça te convient}}
 	\Description{}
 	\label{fig:spectral-approx}
 \end{figure}
@@ -642,7 +650,7 @@ computing the laplacian of the manifold, as well as its eigenspace decomposition
 equivalent in time to the computation of a matrix multiplication (and thus near the resolution of a linear
 system).
 
-\subsection{Runtime of Fast Marching}
+\subsection{Runtime of the Fast Marching algorithm}
 The fast marching algorithm works really similarly to Dijkstra's algorithm by computing locally shortest
 paths.
 As such, it only approximates geodesics (from the approximation on the mesh), but does so by performing at
@@ -689,21 +697,22 @@ as well as their limitations and time complexities.
 \begin{table}[ht]
 	\begin{tblr}[expand=\intertitre]{%
 		rowspec={Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]},
-		colspec={Q[co=1,c]Q[co=1.5,mode=math,c]Q[mode=math,co=1.5,c]Q[co=1,c]Q[c, co=1.5, cmd=\scriptsize]},
+		colspec={Q[co=1,c]Q[co=1.5,mode=math,c]Q[mode=math,co=1.5,c]Q[co=1.2,c]Q[c, co=1.5, font=\scriptsize]},
 		row{3, 5, 8}={bg=teal!20!white},
-				row{1}={c,cmd=\textbf,mode=text,fg=white,bg=teal},
-				colsep=3pt,
-				hline{-},
-				vline{1, 2, 6},
+				row{1} = {c,font=\bfseries,mode=text,fg=white,bg=teal},
+				colsep = 3pt,
+				hlines = {solid},
+				vlines = {1, 2, 6}{solid},
+				vlines = {3, 4, 5}{dashed}
 			}%
-		Method        & Theoretical Runtime & Actual Runtime    & Precision & \small Limitations                                              \\
-		\intertitre{PDE-based methods}                                                                                                        \\
-		Heat          & \O(\nv^{3})         &                   & Approx.   & Stability, runtime, fixed sources, no paths                     \\
-		Poisson       & \O(\nv^{3})         &                   & Approx.   & Stability, not true geodesics, runtime, fixed sources, no paths \\
-		Spectral      & \O(\nv^{3})         &                   & Approx.   & Stability, not true geodesics, runtime, no paths                \\
-		Fast Marching & \O(\nv\log \nv)     & \O(\nv^{1.5}) & Approx.   & Fixed sources, limited to meshes, no paths                         \\
-		\intertitre{Computational geometry methods}                                                                                           \\
-		ICH           & \O(\nv^{2}\log \nv) & \O(\nv^{1.6})     & Exact     & Limited to meshes, fixed (but possibly non-edge) sources
+		Method        & Theoretical Runtime & Actual Runtime & Precision & \small Limitations                                              \\
+		\intertitre{PDE-based methods}                                                                                                     \\
+		Heat          & \O(\nv^{\omega})    &                & Approx.   & Stability, runtime, fixed sources, no paths                     \\
+		Poisson       & \O(\nv^{\omega})    &                & Approx.   & Stability, not true geodesics, runtime, fixed sources, no paths \\
+		Spectral      & \O(\nv^{\omega})    &                & Approx.   & Stability, not true geodesics, runtime, no paths                \\
+		Fast Marching & \O(\nv\log \nv)     & \O(\nv^{1.5})  & Approx.   & Fixed sources, limited to meshes, no paths                      \\
+		\intertitre{Computational geometry methods}                                                                                        \\
+		ICH           & \O(\nv^{2}\log \nv) & \O(\nv^{1.6})  & Exact     & Limited to meshes, fixed (but possibly non-edge) sources
 	\end{tblr}
 	\caption{Summary table comparing the different methods, their limitations and time complexity}
 	\label{tab:summary}
@@ -714,7 +723,12 @@ Improved Chen-Han algorithm, both running in around $\O(\nv^{1.5})$ time in prac
 However, while the fast marching algorithm only allows to compute the distance from a fixed set of sources,
 the Improved Chen-Han algorithm computes all distances with better precision at the cost of a higher
 theoretical runtime, which in practice does not matter when pruning is done properly.
-It is also worth noting that ICH is the only algorithm to natively support path reconstruction; this can be done for some PDE-based methods at the cost of additional work. \todo{\@ matthieu tu peux préciser ça si besoin}
+It is also worth noting that ICH is the only algorithm to natively support path reconstruction;
+this can be done for the fast marching algorithm at the cost of additional work (this is done similarly
+to Dijkstra) but not for the other PDE-based methods.
+Indeed, while those other methods have the advantage of computing all the distances at once, they also have
+the disadvantage of computing all distances at once and because geodesics are not necessarily locally
+optimal in distance, we cannot reconstruct paths from those methods.
 
 \section*{Conclusion}
 In this report, we investigated different methods to compute shortest-paths on meshed $2$-manifolds embedded in $\R^{3}$.
