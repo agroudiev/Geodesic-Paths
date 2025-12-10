@@ -10,6 +10,7 @@
 \usepackage{caption}
 \setlength{\textfloatsep}{10pt plus 1.0pt minus 2.0pt}
 \setlength{\floatsep}{6pt plus 1.0pt minus 2.0pt}
+\captionsetup{aboveskip=6pt}
 
 \def\div{\mathrm{div}}
 \def\O{\mathcal{O}}
@@ -755,10 +756,11 @@ costly manner, both in computing and programming time.
 	\SetCell[c=5]{mode=text,l,font=\itshape\footnotesize}
 	#1 &
 }
+
 \begin{table}[t]
 	\begin{tblr}[expand=\intertitre]{%
 		rowspec={Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]},
-		colspec={Q[co=1,c]Q[co=1.5,mode=math,c]Q[mode=math,co=1.5,c]Q[co=1.2,c]Q[c, co=1.5, font=\scriptsize]},
+		colspec={Q[co=1,c]Q[co=1.5,mode=math,c, font=\scriptsize]Q[mode=math,co=1.5,c,font=\scriptsize]Q[co=1.2,c]Q[c, co=1.5, font=\scriptsize]},
 		hlines = {solid},
 		vline{1, 2, 6} = {solid},
 		vline{3, 4, 5} = {1}{solid},
@@ -778,7 +780,7 @@ costly manner, both in computing and programming time.
 	\end{tblr}
 	\caption{Summary table comparing the different methods, their limitations and time complexity}
 	\label{tab:summary}
-	\vspace*{-20pt}
+	\vspace*{-12pt}
 \end{table}
 
 \section*{Conclusion}
