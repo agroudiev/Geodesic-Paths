@@ -8,13 +8,15 @@
 \input{images/tikz3dheat}
 
 \usepackage{caption}
+\setlength{\textfloatsep}{10pt plus 1.0pt minus 2.0pt}
+\setlength{\floatsep}{6pt plus 1.0pt minus 2.0pt}
 
 \def\div{\mathrm{div}}
 \def\O{\mathcal{O}}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
 \bibliographystyle{alpha}
-\title[Geodesic Paths and Distances on Meshes]{Geodesic Paths and Distances on Meshes\texorpdfstring{: PDE and
+\title[Geodesic Paths and Distances on Meshes]{Geodesic Paths and Distances on Meshes\texorpdfstring{:\\ PDE and
 Computational Geometry Approaches\\{\normalsize Report on \textit{A Survey of 
 Algorithms for Geodesic Paths and Distances}}}{}}
 
@@ -62,11 +64,11 @@ Algorithms for Geodesic Paths and Distances}}}{}}
 
 \begin{teaserfigure}
 	\centering
-	\includegraphics[height=5cm]{images/rabbit-paths.png}
+	\includegraphics[height=3cm]{images/rabbit-paths.png}
 	\hspace{1cm}
-	\includegraphics[height=5cm]{images/venus-paths.png}
+	\includegraphics[height=3cm]{images/venus-paths.png}
 	\hspace{1cm}
-	\includegraphics[height=5cm]{images/star-paths.png}
+	\includegraphics[height=3cm]{images/star-paths.png}
 	\caption{Geodesic paths on meshes, computed with our implementation of the Improved Chen-Han algorithm. Faces are colored from red to green according to the distance of their barycenter to the source point. The geodesic path to each vertex is drawn in blue.}
 	\Description{}
 	\label{fig:teaser}
@@ -99,7 +101,7 @@ based on the resolution of Partial Differential Equations (PDEs) in \autoref{sec
 In \autoref{sec:comp-geom-methods}, we then discuss computational geometry methods, focusing on the
 Improved Chen-Han algorithm.
 Finally, we present experiments and results in \autoref{sec:experiments}, and conclude in the final section.
-\vspace{-1cm}
+
 \section{Mathematical reminders}
 \label{sec:math-reminders}
 Formally, a \imp{$2$-manifold} (without boundary) is a topological space in which all points have
@@ -108,10 +110,10 @@ Such a homeomorphism is called a chart.
 Intuitively, this means that zooming enough on any point of the manifold will make it look like a flat surface.
 In \autoref{fig:manifolds-examples}, we can see that some meshes are not manifolds, as some points are locally non-flat.
 
-\begin{figure}[ht]
+\begin{figure}[t]
 	\centering
-	\includegraphics[width=.4\linewidth]{images/manifold.png}
-	\includegraphics[width=.5\linewidth]{images/nonmanifold.png}
+	\includegraphics[width=.35\linewidth]{images/manifold.png}
+	\includegraphics[width=.45\linewidth]{images/nonmanifold.png}
 	\caption{Examples of a $2$-manifold (left) and non-manifold (right) mesh. (Images generated from our custom viewer.)}
 	\Description{}
 	\label{fig:manifolds-examples}
@@ -235,8 +237,6 @@ or at least geodesic-like curves.
 Indeed, not all of those compute the true geodesic distance, but some sense of distance to a set that
 can be drawn and integrated to find shortest paths, which we call \imp{border distance transforms}.
 
-\smallskip
-
 The following equations all rely on the \imp{Laplace-Beltrami operator} (or Laplacian operator $\Delta$)
 which models the sum of second-order (covariant) derivatives along each axis of a function.
 It is not difficult to understand how such an operator can mimic the propagation of a phenomenon in space.
@@ -262,7 +262,8 @@ It can be derived from the first principle of thermodynamics on infinitesimal sl
 describes the fact that spatial variations of temperature spread quadratically with regard to time.
 This means that spreading temperature from point A to point B will take of the order of magnitude of the
 square of the distance between A and B.
-\begin{figure}[H]
+
+\begin{figure}[t]
 	\centering
 	\input{images/heat-equation}
 	\caption{Illustration of the heat propagation between two slices of material of temperatures $T_2$ and $T_1$.}
@@ -517,7 +518,7 @@ A first natural approach could be to consider the graph formed by the vertices a
 However, this would only yield paths that follow the edges of the mesh, which can be arbitrarily longer
 than the true geodesic paths on the surface (see \autoref{fig:suboptimal-dijkstra}).
 
-\begin{figure}[ht]
+\begin{figure}[t]
 	\centering
 	\begin{tikzpicture}
 		\input{images/dijkstra-suboptimal.tex}
@@ -568,7 +569,7 @@ The original MMP algorithm does not perform aggressive pruning of windows, but t
 the same edge to avoid redundancy later on; this simple trimming strategy is illustrated in
 \autoref{fig:window-trimming-mmp}.
 It uses a priority queue to always propagate the window with the smallest minimum distance first, ensuring both global optimality and early trimming of redundant windows.
-\begin{figure}[ht]
+\begin{figure}[t]
 	\centering
 	\begin{tikzpicture}
 		\input{images/window-mmp.tex}
@@ -585,7 +586,7 @@ which we illustrated in \autoref{fig:one-angle-one-split}; however, overlapping 
 
 The Improved Chen-Han algorithm combines both approaches, using a priority queue to always propagate the window with the smallest minimum distance first, while also employing the ``one angle, one split'' pruning rule from Chen-Han. Another filtering strategy, illustrated in \autoref{fig:window-trimming}, is introduced to discard windows that cannot lead to shorter paths than already explored window going through the same vertices.
 
-\begin{figure}[ht]
+\begin{figure}[t]
 	\centering
 	\begin{tikzpicture}
 		\input{images/one-angle-one-split.tex}
@@ -595,7 +596,7 @@ The Improved Chen-Han algorithm combines both approaches, using a priority queue
 	\label{fig:one-angle-one-split}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[t]
 	\centering
 	\begin{tikzpicture}
 		\input{images/window-filtering.tex}
@@ -634,11 +635,9 @@ and the Improved Chen-Han algorithm.
 All methods being implemented from scratch in the same programming language (Rust),
 and optimized up to a similar level, we believe the comparison to be fairly representative of the
 practical performances of each algorithm.
-
 The code for all implementations, as well as the scripts to reproduce the experiments, is available at:
-\begin{center}
-	\href{https://github.com/agroudiev/Geodesic-Paths}{\texttt{https://github.com/agroudiev/Geodesic-Paths}}
-\end{center}
+
+\href{https://github.com/agroudiev/Geodesic-Paths}{\texttt{https://github.com/agroudiev/Geodesic-Paths}}
 
 \subsection{Methodology}
 We collected a set of 27 meshes of various sizes, ranging from $4$ to $125\,066$ vertices.
@@ -674,7 +673,7 @@ in the complexity constant hidden in the big O notation that the most asymptotic
 algorithms for matrix multiplication and system solving induce and that the asymptotic
 behavior would be more visible on larger meshes.
 
-\begin{figure}[ht]
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=\linewidth]{images/heat_benchmark.pdf}
 	\caption{Benchmark of the time complexity of the \emph{Heat method} on various 3D meshes, as a function of the number of vertices. Slope: $2.63$, $r^2$: $0.99$.}
@@ -695,7 +694,7 @@ eigenvectors non-associated to $0$ as an eigenvalue.
 
 The different colours represent the different methods and the different branches for each method are
 created from different models.
-\begin{figure}[ht]
+\begin{figure}[t]
 	\includegraphics[width=\linewidth]{images/accuracy_spectral_methods.pdf}
 	\caption{$\ell^{2}$ error of the spectral embedding on $k$ vectors to the full spectral embedding.
 		Average computed on most of our manifold examples, as a function of the percentage of the dimension
@@ -721,7 +720,7 @@ priority queues is actually a bit slower\footnote{This is because the \texttt{Bi
 	can be dynamically allowed and is as such a bit slower than the theoretical optimum speed.}
 and the algorithm thus runs in $\O(\nv\sqrt{\nv})$ which is still sub-quadratic.
 
-\begin{figure}[ht]
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=\linewidth]{images/fastmarching_benchmark.pdf}
 	\caption{Benchmark of the time complexity of the \emph{Fast Marching algorithm} on various 3D meshes, as a function of the number of vertices. Slope: $1.51$, $r^2$: $0.98$.}
@@ -734,7 +733,9 @@ Theoretically, the Improved Chen-Han algorithm's time complexity is $\mathcal{O}
 
 \cite{craneSurvey} reports that in practice, the ICH algorithm runs in sub-quadratic time on average, and dramatically improves the performance of the original Chen-Han algorithm, without supporting such a claim with a precise benchmark. We therefore conducted experiments to benchmark the practical runtime of our implementation of the ICH algorithm on various meshes, and report the results in \autoref{fig:ich-experiments-results}.
 
-\begin{figure}[ht]
+The results confirm the sub-quadratic practical runtime of the ICH algorithm, with a fitted slope of $1.60$ on a log-log scale, corresponding to a time complexity of approximately $\mathcal{O}(n^{1.60})$ in practice.
+
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=\linewidth]{images/ich_benchmark.pdf}
 	\caption{Benchmark of the time complexity of the \emph{ICH algorithm} on various 3D meshes, as a function of the number of vertices. Slope: $1.60$, $r^2$: $0.96$.}
@@ -742,40 +743,9 @@ Theoretically, the Improved Chen-Han algorithm's time complexity is $\mathcal{O}
 	\label{fig:ich-experiments-results}
 \end{figure}
 
-The results confirm the sub-quadratic practical runtime of the ICH algorithm, with a fitted slope of $1.60$ on a log-log scale, corresponding to a time complexity of approximately $\mathcal{O}(n^{1.60})$ in practice.
-
 \subsection{Comparison and discussion}
 In \autoref{tab:summary} we present a short summary of all the methods we discussed in this report,
 as well as their limitations and time complexities.
-
-\newcommand\intertitre[1]{%
-	\SetRow{rowsep=1pt,bg=teal!10}
-	\SetCell[c=5]{mode=text,l,font=\itshape\footnotesize}
-	#1 &
-}
-\begin{table}[ht]
-	\begin{tblr}[expand=\intertitre]{%
-		rowspec={Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]},
-		colspec={Q[co=1,c]Q[co=1.5,mode=math,c]Q[mode=math,co=1.5,c]Q[co=1.2,c]Q[c, co=1.5, font=\scriptsize]},
-		row{3, 5, 8}={bg=teal!20!white},
-				row{1} = {c,font=\bfseries,mode=text,fg=white,bg=teal},
-				colsep = 3pt,
-				hlines = {solid},
-				vlines = {1, 2, 6}{solid},
-				vlines = {3, 4, 5}{dashed}
-			}%
-		Method        & Theoretical Runtime & Actual Runtime & Precision & \small Limitations                                              \\
-		\intertitre{PDE-based methods}                                                                                                     \\
-		Heat          & \O(\nv^{\omega})    &                & Approx.   & Stability, runtime, fixed sources, no paths                     \\
-		Poisson       & \O(\nv^{\omega})    &                & Approx.   & Stability, not true geodesics, runtime, fixed sources, no paths \\
-		Spectral      & \O(\nv^{\omega})    &                & Approx.   & Stability, not true geodesics, runtime, no paths                \\
-		Fast Marching & \O(\nv\log \nv)     & \O(\nv^{1.5})  & Approx.   & Fixed sources, limited to meshes, no paths                      \\
-		\intertitre{Computational geometry methods}                                                                                        \\
-		ICH           & \O(\nv^{2}\log \nv) & \O(\nv^{1.6})  & Exact     & Limited to meshes, fixed (but possibly non-edge) sources
-	\end{tblr}
-	\caption{Summary table comparing the different methods, their limitations and time complexity}
-	\label{tab:summary}
-\end{table}
 
 We see in the table that two methods stand out: the Fast-Marching algorithm and the
 Improved Chen-Han algorithm, both running in around $\O(\nv^{1.5})$ time in practice.
@@ -789,6 +759,37 @@ Indeed, while those other methods have the advantage of computing all the distan
 the disadvantage of computing all distances at once and because geodesics are not necessarily locally
 optimal in distance, we cannot reconstruct exact paths from those methods, but only integrate them in a
 costly manner, both in computing and programming time.
+
+
+\newcommand\intertitre[1]{%
+	\SetRow{rowsep=1pt,bg=teal!10}
+	\SetCell[c=5]{mode=text,l,font=\itshape\footnotesize}
+	#1 &
+}
+\begin{table}[t]
+	\begin{tblr}[expand=\intertitre]{%
+		rowspec={Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]},
+		colspec={Q[co=1,c]Q[co=1.5,mode=math,c]Q[mode=math,co=1.5,c]Q[co=1.2,c]Q[c, co=1.5, font=\scriptsize]},
+		hlines = {solid},
+		vline{1, 2, 6} = {solid},
+		vline{3, 4, 5} = {1}{solid},
+		vline{3, 4, 5} = {2-Z}{dashed},
+		row{3, 5, 8}={bg=teal!20!white},
+				row{1} = {c,font=\bfseries,mode=text,fg=white,bg=teal},
+				colsep = 3pt
+			}%
+		Method        & Theoretical Runtime & Actual Runtime & Precision & \small Limitations                                              \\
+		\intertitre{PDE-based methods}                                                                                                     \\
+		Heat          & \O(\nv^{\omega})    &                & Approx.   & Stability, runtime, fixed sources, no paths                     \\
+		Poisson       & \O(\nv^{\omega})    &                & Approx.   & Stability, not true geodesics, runtime, fixed sources, no paths \\
+		Spectral      & \O(\nv^{\omega})    &                & Approx.   & Stability, not true geodesics, runtime, no paths                \\
+		Fast Marching & \O(\nv\log \nv)     & \O(\nv^{1.5})  & Approx.   & Fixed sources, limited to meshes, no paths                      \\
+		\intertitre{Computational geometry methods}                                                                                        \\
+		ICH           & \O(\nv^{2}\log \nv) & \O(\nv^{1.6})  & Exact     & Limited to meshes, fixed (but possibly non-edge) sources
+	\end{tblr}
+	\caption{Summary table comparing the different methods, their limitations and time complexity}
+	\label{tab:summary}
+\end{table}
 
 \section*{Conclusion}
 In this report, we investigated different methods to compute shortest-paths on meshed $2$-manifolds embedded in $\R^{3}$.
