@@ -502,10 +502,11 @@ non-meshed manifolds, we can leverage the fact that our manifold is meshed to de
 algorithms.
 A whole class of such algorithms, arising from \imp{computational geometry}, can be classified according to
 two main caracteristics.
-Global methods compute globally optimal paths, up to numerical precision, while local methods start from an initial non-geodesic path and iteratively improve it until convergence to a local minimum. Exact methods compute the exact geodesic distance, while some approximate methods trade accuracy for speed.
-% \paragraph{Global vs.~local} Global methods compute globally optimal paths, up to numerical precision. Local methods start from an initial non-geodesic path and iteratively improve it until convergence to a local minimum.
-% \paragraph{Exact vs.~approximate} Exact methods compute the exact geodesic distance, while some approximate methods trade accuracy for speed, and compute only an approximation of the geodesic distance within some guaranteed error bound.
-% \vspace{5pt}
+% Global methods compute globally optimal paths, up to numerical precision, while local methods start from an initial non-geodesic path and iteratively improve it until convergence to a local minimum. Exact methods compute the exact geodesic distance, while some approximate methods trade accuracy for speed.
+\paragraph{Global vs.~local} Global methods compute globally optimal paths, up to numerical precision. Local methods start from an initial non-geodesic path and iteratively improve it until convergence to a local minimum.
+\paragraph{Exact vs.~approximate} Exact methods compute the exact geodesic distance, while some approximate methods trade accuracy for speed, and compute only an approximation of the geodesic distance within some guaranteed error bound.
+
+\vspace{5pt}
 In the following, we focus on a global and exact method, the \imp{Improved Chen-Han algorithm}
 \cite{chen1990shortest,xin2009improving}.
 
@@ -710,17 +711,17 @@ priority queues is actually a bit slower\footnote{This is because the \texttt{Bi
 	can be dynamically allowed and is as such a bit slower than the theoretical optimum speed.}
 and the algorithm thus runs in $\O(\nv\sqrt{\nv})$ which is still sub-quadratic.
 
-\begin{figure}[t]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=\linewidth]{images/fastmarching_benchmark.pdf}
 	\caption{Benchmark of the time complexity of the \emph{Fast Marching algorithm} on various 3D meshes, as a function of the number of vertices. Slope: $1.51$, $r^2$: $0.98$.}
 	\Description{}
 	\label{fig:fastmarching-experiments-results}
 \end{figure}
+\vspace{-10pt}
 
 \subsection{Runtime of the ICH algorithm}
 Theoretically, the Improved Chen-Han algorithm's time complexity is $\mathcal{O}(n^2 \log n)$ on a mesh with $n$ vertices, which is worse than the $\mathcal{O}(n^2)$ previously obtained by the Chen-Han algorithm, the $\log n$ factor coming from the priority queue management.
-
 \cite{craneSurvey} reports that in practice, the ICH algorithm runs in sub-quadratic time on average, and dramatically improves the performance of the original Chen-Han algorithm, without supporting such a claim with a precise benchmark. We therefore conducted experiments to benchmark the practical runtime of our implementation of the ICH algorithm on various meshes, and report the results in \autoref{fig:ich-experiments-results}.
 
 Our results confirm the sub-quadratic practical runtime of the ICH algorithm, with a fitted slope of $1.60$ on a log-log scale, corresponding to a time complexity of approximately $\mathcal{O}(n^{1.60})$ in practice.
@@ -778,9 +779,10 @@ costly manner, both in computing and programming time.
 		\intertitre{Computational geometry methods}                                                                                        \\
 		ICH           & \O(\nv^{2}\log \nv) & \O(\nv^{1.6})  & Exact     & Limited to meshes, fixed (but possibly non-edge) sources
 	\end{tblr}
+	\vspace{5pt}
 	\caption{Summary table comparing the different methods, their limitations and time complexity}
 	\label{tab:summary}
-	\vspace*{-12pt}
+	% \vspace*{-12pt}
 \end{table}
 
 \section*{Conclusion}
