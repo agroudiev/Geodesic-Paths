@@ -69,7 +69,7 @@ Algorithms for Geodesic Paths and Distances}}}{}}
 	\includegraphics[height=3cm]{images/venus-paths.png}
 	\hspace{1cm}
 	\includegraphics[height=3cm]{images/star-paths.png}
-	\caption{Geodesic paths on meshes, computed with our implementation of the Improved Chen-Han algorithm. Faces are colored from red to green according to the distance of their barycenter to the source point. The geodesic path to each vertex is drawn in blue.}
+	\caption{Geodesic paths on meshes, computed with our implementation of the Improved Chen-Han algorithm. Faces are colored from red to green according to their distance to the source point. The geodesic path to each vertex is drawn in blue.}
 	\Description{}
 	\label{fig:teaser}
 \end{teaserfigure}
@@ -112,8 +112,8 @@ In \autoref{fig:manifolds-examples}, we can see that some meshes are not manifol
 
 \begin{figure}[t]
 	\centering
-	\includegraphics[width=.35\linewidth]{images/manifold.png}
-	\includegraphics[width=.45\linewidth]{images/nonmanifold.png}
+	\includegraphics[width=.32\linewidth]{images/manifold.png}
+	\includegraphics[width=.42\linewidth]{images/nonmanifold.png}
 	\caption{Examples of a $2$-manifold (left) and non-manifold (right) mesh. (Images generated from our custom viewer.)}
 	\Description{}
 	\label{fig:manifolds-examples}
@@ -501,11 +501,10 @@ non-meshed manifolds, we can leverage the fact that our manifold is meshed to de
 algorithms.
 A whole class of such algorithms, arising from \imp{computational geometry}, can be classified according to
 two main caracteristics.
-
-\paragraph{Global vs.~local} Global methods compute globally optimal paths, up to numerical precision. Local methods start from an initial non-geodesic path and iteratively improve it until convergence to a local minimum.
-\paragraph{Exact vs.~approximate} Exact methods compute the exact geodesic distance, while some approximate methods trade accuracy for speed, and compute only an approximation of the geodesic distance within some guaranteed error bound.
-\vspace{5pt}
-
+Global methods compute globally optimal paths, up to numerical precision, while local methods start from an initial non-geodesic path and iteratively improve it until convergence to a local minimum. Exact methods compute the exact geodesic distance, while some approximate methods trade accuracy for speed.
+% \paragraph{Global vs.~local} Global methods compute globally optimal paths, up to numerical precision. Local methods start from an initial non-geodesic path and iteratively improve it until convergence to a local minimum.
+% \paragraph{Exact vs.~approximate} Exact methods compute the exact geodesic distance, while some approximate methods trade accuracy for speed, and compute only an approximation of the geodesic distance within some guaranteed error bound.
+% \vspace{5pt}
 In the following, we focus on a global and exact method, the \imp{Improved Chen-Han algorithm}
 \cite{chen1990shortest,xin2009improving}.
 
@@ -535,19 +534,15 @@ This still yields an infinite number of potential nodes; a key concept of the MM
 instead a data structure called \imp{windows}, which encapsulate a continuous interval of points on an
 edge, along with the information needed to propagate the shortest path from these points to adjacent faces.
 
-Formally, a window
-\begin{equation*}
-	w = (s, p, e, b_0, b_1, d_0, d_1, \sigma)
-\end{equation*}
+Formally, a window $w = (s, p, e, b_0, b_1, d_0, d_1, \sigma)$
 is defined on edge $e$, between points $b_0$ and $b_1$ (see \autoref{fig:ich-windows}).
 The window represents shortest paths originating from a ``pseudosource'' $p$, at a distance $\sigma$ from
 the actual source $s$.
 Distances from $p$ to the endpoints $b_0$ and $b_1$ of the window, respectively $d_0$ and $d_1$, are also
 stored.
 
-\begin{figure}
+\begin{figure}[ht]
 	\centering
-	% \includegraphics[width=\linewidth]{images/window-illustration.png}
 	\begin{tikzpicture}
 		\input{images/window-illustration.tex}
 	\end{tikzpicture}
@@ -555,6 +550,7 @@ stored.
 	\Description{}
 	\label{fig:ich-windows}
 \end{figure}
+\vspace*{-10pt}
 
 \subsection{Window management and pruning}
 While all revolving around the same core idea of continuous Dijkstra, different algorithms differ in how
@@ -566,8 +562,7 @@ However, the different algorithms differ in how they \imp{prune} and prioritize 
 theoretical and practical complexity.
 
 The original MMP algorithm does not perform aggressive pruning of windows, but trim overlapping windows on
-the same edge to avoid redundancy later on; this simple trimming strategy is illustrated in
-\autoref{fig:window-trimming-mmp}.
+the same edge to avoid redundancy later on (see \autoref{fig:window-trimming-mmp}).
 It uses a priority queue to always propagate the window with the smallest minimum distance first, ensuring both global optimality and early trimming of redundant windows.
 \begin{figure}[t]
 	\centering
@@ -586,7 +581,7 @@ which we illustrated in \autoref{fig:one-angle-one-split}; however, overlapping 
 
 The Improved Chen-Han algorithm combines both approaches, using a priority queue to always propagate the window with the smallest minimum distance first, while also employing the ``one angle, one split'' pruning rule from Chen-Han. Another filtering strategy, illustrated in \autoref{fig:window-trimming}, is introduced to discard windows that cannot lead to shorter paths than already explored window going through the same vertices.
 
-\begin{figure}[t]
+\begin{figure}[ht]
 	\centering
 	\begin{tikzpicture}
 		\input{images/one-angle-one-split.tex}
@@ -596,7 +591,7 @@ The Improved Chen-Han algorithm combines both approaches, using a priority queue
 	\label{fig:one-angle-one-split}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[ht]
 	\centering
 	\begin{tikzpicture}
 		\input{images/window-filtering.tex}
@@ -619,9 +614,7 @@ As other methods, the input of the algorithm is a $2$-manifold represented as a 
 However, we also need to represent edges $\E$ explicitly, as windows are defined on edges. We therefore employ an edge data structure, storing for each edge both geometric information (length) and topological information (adjacent faces, vertices, \dots).
 Notably, we precompute the twin edges for each edge, which is repeatedly invoked during window propagation.
 
-The main algorithm relies on a priority queue of windows, ordered by the minimum distance from the source to any point in the window.
-We implement this priority queue as a binary heap, using Rust's standard library implementation.
-Windows are represented as structs containing all the necessary information for propagation, as described above.
+The main algorithm relies on a priority queue of windows, ordered by the minimum distance from the source to any point in the window, and implemented as a binary heap.
 Information about the vertices, such as the edge from which the shortest path to the vertex originates, is also stored during the main loop of the algorithm to enable path reconstruction later on.
 
 \subsubsection{Limitations}
@@ -644,18 +637,14 @@ We collected a set of 27 meshes of various sizes, ranging from $4$ to $125\,066$
 Mesh come from various sources, including the Thingi10k dataset
 \cite{zhou2016thingi10kdataset100003dprinting}, filtered to only contain manifolds with a single connected
 component.
-Each mesh was processed by our implementation of each method, starting from a single source vertex chosen arbitrarily.
-For each mesh, each algorithm has been run 10 times with different source vertices, each point
-corresponding to the average runtime over these runs.
+Each mesh was processed 10 times by our implementation of each method, starting from a single random source vertex each time.
 All experiments were conducted on a MacBook Pro with a 3.22 GHz Apple M1 Pro chip and 32GB of
 RAM.
 Plots are presented on a log-log scale, and when appropriate, a \imp{linear regression} is
 fitted to the data points to estimate the practical time complexity of each method.
 
 Care should be taken when interpreting the following results, as the runtime depends on the
-specific geometry of the meshes used in the benchmark, and may not generalize to all possible
-meshes.
-The number of vertices is not always a fair indicator of the complexity of the geometry, and other factors such as the distribution of vertex valences and curvature may also impact the practical runtime of the algorithm.
+specific geometry of the meshes used in the benchmark, not only on the number of vertices.
 
 \subsection{Benchmarking of linear PDE methods}
 \paragraph{Runtime of the linear PDE methods}
@@ -733,7 +722,7 @@ Theoretically, the Improved Chen-Han algorithm's time complexity is $\mathcal{O}
 
 \cite{craneSurvey} reports that in practice, the ICH algorithm runs in sub-quadratic time on average, and dramatically improves the performance of the original Chen-Han algorithm, without supporting such a claim with a precise benchmark. We therefore conducted experiments to benchmark the practical runtime of our implementation of the ICH algorithm on various meshes, and report the results in \autoref{fig:ich-experiments-results}.
 
-The results confirm the sub-quadratic practical runtime of the ICH algorithm, with a fitted slope of $1.60$ on a log-log scale, corresponding to a time complexity of approximately $\mathcal{O}(n^{1.60})$ in practice.
+Our results confirm the sub-quadratic practical runtime of the ICH algorithm, with a fitted slope of $1.60$ on a log-log scale, corresponding to a time complexity of approximately $\mathcal{O}(n^{1.60})$ in practice.
 
 \begin{figure}[t]
 	\centering
@@ -789,6 +778,7 @@ costly manner, both in computing and programming time.
 	\end{tblr}
 	\caption{Summary table comparing the different methods, their limitations and time complexity}
 	\label{tab:summary}
+	\vspace*{-20pt}
 \end{table}
 
 \section*{Conclusion}
