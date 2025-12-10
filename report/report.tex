@@ -65,11 +65,11 @@ Algorithms for Geodesic Paths and Distances}}}{}}
 
 \begin{teaserfigure}
 	\centering
-	\includegraphics[height=3cm]{images/rabbit-paths.png}
+	\includegraphics[height=3.3cm]{images/rabbit-paths.png}
 	\hspace{1cm}
-	\includegraphics[height=3cm]{images/venus-paths.png}
+	\includegraphics[height=3.3cm]{images/venus-paths.png}
 	\hspace{1cm}
-	\includegraphics[height=3cm]{images/star-paths.png}
+	\includegraphics[height=3.3cm]{images/star-paths.png}
 	\caption{Geodesic paths on meshes, computed with our implementation of the Improved Chen-Han algorithm. Faces are colored from red to green according to their distance to the source point. The geodesic path to each vertex is drawn in blue.}
 	\Description{}
 	\label{fig:teaser}
@@ -733,7 +733,7 @@ Our results confirm the sub-quadratic practical runtime of the ICH algorithm, wi
 \end{figure}
 
 \subsection{Comparison and discussion}
-In \autoref{tab:summary} we present a short summary of all the methods we discussed in this report,
+In \autoref{tab:summary}, we present a short summary of all the methods we discussed in this report,
 as well as their limitations and time complexities.
 
 We see in the table that two methods stand out: the Fast-Marching algorithm and the
@@ -788,8 +788,7 @@ In this report, we investigated different methods to compute shortest-paths on m
 We presented two classes of methods: PDE-based methods, which solve physical equations on the manifold to
 retrieve geodesic distances, and computational geometry methods, which leverage the meshed structure of the
 manifold to design efficient algorithms.
-We provided from-scratch implementations of three methods: the heat method, fast marching, and the Improved
-Chen-Han algorithm, and compared their practical performances on various datasets of meshes.
+We provided from-scratch implementations of three methods: the heat method, the fast marching algorithm, the spectral embedding resistance distance transform, the Poisson equation border transform, and the Improved Chen-Han algorithm.
 Our experiments brought to light the practical runtime of each method, as well as their respective
 strengths and limitations.
 
