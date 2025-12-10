@@ -46,6 +46,8 @@ Algorithms for Geodesic Paths and Distances}}}{}}
 \def\nf{n_{\F}}
 \def\d{\mathrm{d}}
 
+\def\imp#1{\textcolor{purple}{\bfseries #1}}
+
 \begin{abstract}
 	In this report, we investigate different methods to compute shortest-paths
 	on meshed $2$-manifolds embedded in $\R^{3}$, based on \cite{craneSurvey}.
@@ -74,21 +76,34 @@ Algorithms for Geodesic Paths and Distances}}}{}}
 \maketitle
 
 \section*{Introduction}
-Computing the distance between two points and retrieving a shortest path is, in general, a fundamental problem in computer science. While the problem is well understood in flat, Euclidean spaces, as well as on graphs, it becomes more challenging when considering curved surfaces. Indeed, the geodesic distance between two points on a surface is defined as the length of the shortest path that lies entirely on the surface. Computing such distances and paths is a non-trivial task, even when the surface is represented as a discrete mesh.
+Computing the distance between two points and retrieving a shortest path is, in general, a fundamental
+problem in computer science.
+While the problem is well understood in flat, Euclidean spaces, as well as on graphs, it becomes more challenging when considering curved surfaces. Indeed, the geodesic distance between two points on a surface is defined as the length of the shortest path that lies entirely on the surface. Computing such distances and paths is a non-trivial task, even when the surface is represented as a discrete mesh.
 
-Such a problem arises in various fields, including computer graphics, robotics, medical imaging, and computer vision. In computer graphics, geodesic distances are used for texture mapping \cite{oliveira2010geotextures}; in robotics, they form the cornerstone of path planning algorithms on complex terrains \cite{garrido2013application}; in medical imaging, they assist in analyzing anatomical structures \cite{miller2006geodesic}; and in computer vision, they improve object recognition and shape analysis \cite{shamai2017geodesic}.
+Such a problem arises in various fields, including computer graphics, robotics, medical imaging, and
+computer vision.
+In computer graphics, geodesic distances are used for texture mapping \cite{oliveira2010geotextures};
+in robotics, they form the cornerstone of path planning algorithms on complex terrains \cite{garrido2013application};
+in medical imaging, they assist in analyzing anatomical structures \cite{miller2006geodesic};
+and in computer vision, they improve object recognition and shape analysis \cite{shamai2017geodesic}.
 
-The ability to efficiently compute geodesic distances and paths is therefore crucial for many applications in which the size of the problem is large, and where real-time performance is required. In the polyhedral setting, where the surface is represented as a mesh of vertices, edges, and faces, the number of vertices is derived from the desired accuracy of the representation, and can thus be very large. Algorithms with a low theoretical and practical complexity are therefore essential to handle such large-scale problems.
+The ability to efficiently compute geodesic distances and paths is therefore crucial for many applications
+in which the size of the problem is large, and where real-time performance is required.
+In the polyhedral setting, where the surface is represented as a mesh of vertices, edges, and faces, the
+number of vertices is derived from the desired accuracy of the representation, and can thus be very large.
+Algorithms with a low theoretical and practical complexity are therefore essential to handle such
+large-scale problems.
 
 After brief mathematical reminders in \autoref{sec:math-reminders}, we present four classes of methods
 based on the resolution of Partial Differential Equations (PDEs) in \autoref{sec:pde-methods}.
-Then, in \autoref{sec:comp-geom-methods}, we discuss computational geometry methods, focusing on the Improved Chen-Han algorithm.
+In \autoref{sec:comp-geom-methods}, we then discuss computational geometry methods, focusing on the
+Improved Chen-Han algorithm.
 Finally, we present experiments and results in \autoref{sec:experiments}, and conclude in the final section.
-
+\vspace{-1cm}
 \section{Mathematical reminders}
 \label{sec:math-reminders}
-Formally, a $2$-manifold (without boundary) is a topological space in which all points have neighborhoods
-homeomorphic to disks (without boundary) in $\R^{2}$.
+Formally, a \imp{$2$-manifold} (without boundary) is a topological space in which all points have
+neighborhoods homeomorphic to disks (without boundary) in $\R^{2}$.
 Such a homeomorphism is called a chart.
 Intuitively, this means that zooming enough on any point of the manifold will make it look like a flat surface.
 In \autoref{fig:manifolds-examples}, we can see that some meshes are not manifolds, as some points are locally non-flat.
@@ -119,11 +134,11 @@ We can define the length of a curve $\gamma: [a, b] \to M$ on such a manifold as
 \begin{equation}
 	L(\gamma) = \int_{a}^{b}\sqrt{g_{\gamma(t)}\left(\dot{\gamma}(t), \dot{\gamma}(t)\right)}\d t.
 \end{equation}
-The geodesic (curve) between $p$ and $q$ is the curve $\gamma$ verifying
+The \imp{geodesic (curve)} between $p$ and $q$ is the curve $\gamma$ verifying
 \begin{equation*}
 	\gamma = \arg\min_{\gamma: [0, 1] \to M, \gamma(0) = p, \gamma(1) = q} L(\gamma).
 \end{equation*}
-The length of the geodesic between $p$ and $q$ is the called the geodesic distance.
+The length of the geodesic between $p$ and $q$ is the called the \imp{geodesic distance}.
 As presented above, computing the geodesic curves and the geodesic distances has multiple applications,
 and this is the problem we will be tackling in this report.
 
@@ -133,18 +148,18 @@ In our context, we will be given a $2$-manifold already meshed%
 \footnote{\cite{craneSurvey} gives a few methods to create such a meshing.
 	In particular, our implementations of the methods are restricted without loss of generality to triangular
 	faces; more general meshes can be considered through triangulation techniques.}%
-, that is, a finite set $\V \subseteq \R^{3}$ of vertices
+, that is, a finite set $\V \subseteq \R^{3}$ of \imp{vertices}
 (of cardinal $\nv$) and a finite set $\F \subseteq \left\llbracket 1, \nf\right\rrbracket^{3}$
-of faces, given by the indices of the associated vertices.
-The edges $\E$ of the manifold are given by any subsets of size two of a face $f \in \F$.
+of \imp{faces}, given by the indices of the associated vertices.
+The \imp{edges} $\E$ of the manifold are given by any subsets of size two of a face $f \in \F$.
 Because continuous functions on the manifold cannot be fully represented in memory, and especially by a
 finite number of points on the mesh, functions on the manifold will be approximated by functions
 on $\V$, on $\E$ or on $\F$.
-As such, we will take any function and interpolate it linearly on each face, giving us a piecewise-linear
-function.
+As such, we will take any function and interpolate it linearly on each face, giving us a
+\imp{piecewise-linear (PL) function}.
 
-A path on a piecewise-linear manifold can then be understood as interpolating on pieces of the manifold, or
-directly computing the curves on the mesh.
+A path on a \imp{piecewise-linear (PL) manifold} (or equivalently \imp{meshed manifold}) can then be
+understood as interpolating on pieces of the manifold, or directly computing the curves on the mesh.
 The quality of the approximation by the mesh of the $2$-manifold will never be taken into account in the
 quality results.
 Finding the best approximation of a curved surface by a mesh is a whole other problem that we will not address in this report.
@@ -153,18 +168,26 @@ We now present two classes of methods to compute such geodesic paths and distanc
 
 \section{PDE-based methods}
 \label{sec:pde-methods}
-In this section we will study methods inspired by Partial Differential Equations (PDE) that arise from models
-of physical phenomena.
+In this section we will study methods inspired by \imp{partial differential equations} (PDE) that arise
+from models of physical phenomena.
 Indeed, many physical phenomena propagate along the surfaces over time, and dissipate over space, thus
 allowing us to retrieve geodesics from solutions to the equations.
+These \imp{diffusion processes, propagation mechanisms} or simply equations implicating a differential over
+space are fundamental in physics as they allow to draw conclusions on a global scale from spatially local
+properties\footnote{For example, knowing the electromagnetic light field on a plane allows to derive it
+	uniquely on all of space.}.
+This gives the intuition to why using PDEs to study geodesics (and vice-versa) is indeed interesting.
+Moreover, it is also important to note that these equations work in all generality, even though we will
+apply them only to PL manifolds whose faces are triangular for simplicity.
 
 \subsection{General Theory}
-Consider the parabolic heat equation
+Consider for this example the parabolic heat equation
 \begin{equation*}
 	\frac{\d}{\d t}u_{t} = \Delta u_{t}.
 \end{equation*}
-Here, $u_{t}$ is the temperature profile at time $t$ and $\Delta$ is the Laplacian operator (or divergence of the gradient operator).
-However, on a piecewise-linear (PL) manifold, because functions on vertices are interpolated linearly to
+Here, $u_{t}$ is the temperature profile at time $t$ and $\Delta$ is the Laplacian operator
+(or divergence of the gradient operator).
+However, on a PL manifold, because functions on vertices are interpolated linearly to
 become functions on the manifold, the gradient is piecewise-constant and can be computed explicitly from the
 values at each vertex.
 Consider a face $f \in \F$ with vertices $p_{i}, p_{j}, p_{k} \in \R^{3}$.
@@ -173,22 +196,25 @@ The face normal is
 \begin{equation*}
 	\overrightarrow{n_{f}} = \frac{e_{1} \times e_{2}}{\abs{e_{1} \times e_{2}}},
 \end{equation*}
-where $\times$ is the cross product in $\R^{3}$
-and thus the gradient, being perpendicular to level curves is
+where $\times$ is the cross product in $\R^{3}$ and thus the \imp{face gradient},
+being perpendicular to level curves is
 \begin{equation}
 	\nabla u_{\mid_{f}} = \frac{1}{2A_{f}}\sum_{l \in f}u_{l}(\overrightarrow{n_{f}}\times e_{l}), \label{eq:facegrad}
 \end{equation}
-where $A_{f} = \frac{1}{2}\abs{e_{1} \times e_{2}}$ is the area of face $f$ and $e_{l}$ is the \textbf{opposite} to vertex $l$.
-Note that we can represent the gradient as a matrix $G \in \R^{\nv \times 3\nf}$, although this
+where $A_{f} = \frac{1}{2}\abs{e_{1} \times e_{2}}$ is the area of face $f$ and $e_{l}$ is the
+edge \textbf{opposite} to vertex $l$.
+Note that we can represent the \imp{face gradient} as a matrix $G \in \R^{\nv \times 3\nf}$, although this
 representation is really inefficient for practical computation.
-The definition of the divergence then comes from the Gauss-Ostrogradski theorem by intregration by parts
+The definition of the \imp{divergence} then comes from the Gauss-Ostrogradski theorem by integration by
+parts
 \begin{equation}
 	\left(\nabla \cdot X\right)_{i} = \frac{1}{A_{i}}\sum_{f \ni i}\sum_{e \in f}\frac{1}{2}\cot{\left(\alpha_{e}^{f}\right)}\langle X_{f}, e\rangle, \label{eq:divergence}
 \end{equation}
 where $A_{i}$ is the Voronoi area associated with vertex $i$ and $\alpha_{e}^{f}$ is the angle at the vertex
 opposite to edge $e$ in $f$.
 
-Finally, we can define the Laplace-Beltrami operator (the PL version of the continuous Laplacian) as $\Delta = (\nabla \cdot) \circ \nabla : \V \to \R$ or simply
+Finally, we can define the \imp{Laplace-Beltrami operator} (the PL version of the continuous Laplacian) as
+$\Delta = (\nabla \cdot) \circ \nabla : \V \to \R$ or directly
 \begin{equation}
 	(\Delta u)_{i} = \frac{1}{2A_{i}}\sum_{e = (i, j)}\left(\cot \alpha_{i, j} + \cot \beta_{i, j}\right)\left(u_{i} - u_{j}\right),\label{eq:laplacian}
 \end{equation}
@@ -197,21 +223,22 @@ One could then see the Laplace-Beltrami operator as a matrix $L \in \R^{\nv \tim
 
 \smallskip
 
-After the spatial discretization of the laplace operator we just described, operating a time discretization in a single
-backward Euler step for some fixed time $t$ will give us approximate solutions to the equation.
+After the spatial discretization of the laplacian operator we just described, operating a time
+discretization in a single backward Euler step for some fixed time $t$ will give us approximate solutions
+to the equation, when the equation does indeed define a variating process in time.
 If we want to find the distance maps from some set $X \subseteq \V$, we simply solve the linear equation
 associated to the continuous equation we need to solve.
 
 \subsection{Physical Equations}
 In our implementation, we compared multiple methods based on physical phenomena allowing to trace geodesics,
 or at least geodesic-like curves.
-Indeed, not all of those compute the true geodesic distance, but some sense of distance that can be drawn
-and integrated to find shortest paths.
+Indeed, not all of those compute the true geodesic distance, but some sense of distance to a set that
+can be drawn and integrated to find shortest paths, which we call \imp{border distance transforms}.
 
 \smallskip
 
-The following equations all rely on the Laplace-Beltrami operator (or Laplacian operator $\Delta$) which
-models the sum of second-order derivatives along each axis of a function.
+The following equations all rely on the \imp{Laplace-Beltrami operator} (or Laplacian operator $\Delta$)
+which models the sum of second-order (covariant) derivatives along each axis of a function.
 It is not difficult to understand how such an operator can mimic the propagation of a phenomenon in space.
 Indeed, the Laplacian of $u$ at $x$ measures the average extent of the deviation from the value of $u$ near
 $x$ to the value of $u$ at $x$.
@@ -220,18 +247,17 @@ quantity at nearby points (possibly with a time deviation), the Laplacian natura
 Adding this to the symmetry at the core of the Laplacian's definition (in a local coordinate frame), when the laws of deviation are symmetric, which is often the case in physics, the Laplacian is bound to appear.
 From a more mathematical point of view, the Laplacian is the first scalar linear differential operator
 being covariant\footnote{Considering the linear category of differential operators between tensor fields,
-	we can prove that the Laplacian is generated by the covariant derivative ; which in Riemannian
+	one can prove that the Laplacian is generated by the covariant derivative ; which in Riemannian
 	geometry can be thought as the derivative along a vector adjusted to respect the Riemannian tensor
 	metric of the	manifold.}, and is fundamental as such.
 
 \paragraph{Heat Method}
-This method is based on the heat equation
+This \imp{heat method} is, unsurprisingly, based on the aforementioned \imp{heat equation}
 \begin{equation}
 	\nabla u_{t} = \frac{\d}{\d t}u_{0},\label{eq:heat}
 \end{equation}
-which models the
-evolution of temperature profiles $u_{t}$ in time in a given material, which here will be our surface,
-from the initial profile $u_{0}$.
+which models the evolution of temperature profiles $u_{t}$ in time in a given material, which here will be
+our surface, from the initial profile $u_{0}$.
 It can be derived from the first principle of thermodynamics on infinitesimal slices of material and
 describes the fact that spatial variations of temperature spread quadratically with regard to time.
 This means that spreading temperature from point A to point B will take of the order of magnitude of the
@@ -256,9 +282,9 @@ This fact comes from the Varadhan formula $\phi(x, y) = \lim_{t \to 0}\sqrt{-4t 
 with $h$ the mean spacing between adjacent nodes, as $h\Delta$ is invariant with respect to scale.
 
 \paragraph{Poisson Equations}
-The equations in this paragraph all allow to draw geodesics-like curves, although they do not give the
-actual metric on the manifold.
-They are all based on the Poisson equation
+The equations we consider for the underlying physical process in this paragraph all allow to draw geodesics-
+like curves, although they do not give the actual metric on the manifold.
+They are all variations on the \imp{Poisson equation}
 \begin{equation}
 	\Delta u = u_{0},\label{eq:poisson}
 \end{equation}
@@ -267,7 +293,8 @@ This equation can be derived, for example, from the Maxwell equations to compute
 along a charge distribution, the equivalent theorems about gravitation, or from the momentum equation to
 compute the pressure in an incompressible fluid given its velocity.
 
-The Poisson equations we consider are the screened Poisson equation and the border Poisson equation
+The Poisson equations we consider are the \imp{screened Poisson equation} and the
+\imp{border Poisson equation}
 \begin{equation*}
 	\begin{cases}
 		u                              & = 1 \text{ on } \partial M \\
@@ -281,11 +308,12 @@ The Poisson equations we consider are the screened Poisson equation and the bord
 \end{equation*}
 which both characterize a sense of distance $u$ to the border conditions $\partial M$ which in our case are
 the sources, the points we wish to consider distances to.
-This type of distance we call a border distance transform.
+Formally, both compute a different border distance transform from $\partial M$.
 
 \paragraph{Spectral Methods}\label{par:spectral}
-Like the previous class of equations, the spectral methods we will present below only allow to compute a
-sense of distance on the manifold, which is not the geodesic distance on the embedding in $\R^{3}$.
+Like the previous class of equations, the \imp{spectral methods} we will present below only allow to
+compute a sense of distance on the manifold, which is not the geodesic distance on the embedding in
+$\R^{3}$.
 However, unlike the previous methods, it will allow us to compute distances between every pair of points,
 and not simply from a set of sources.
 
@@ -304,7 +332,7 @@ of $\psi_{1}, \ldots, \psi_{k}$.
 
 \cite{belkin2003eigenmaps} argue that this embedding minimizes the $\ell^{2}$ norm of the distortion when
 considering embeddings with eigenvectors of the Laplacian. We then simply need to define the notion of
-distance we want to consider on this embedding.
+distance we want to consider on this \imp{spectral embedding}.
 We implemented multiple proposals to compute $\phi^{2}(x, y)$, which are basically all the sum of
 some transform of the eigenvalues $\lambda_{i}$ multiplied by the squared $\ell^{2}$ difference of the
 embeddings $\left(\psi_{i}(x) - \psi_{i}(y)\right)^{2}$:
@@ -318,8 +346,8 @@ embeddings $\left(\psi_{i}(x) - \psi_{i}(y)\right)^{2}$:
 \end{equation}
 
 To understand why these transforms of the eigenvalues which might seem a bit random do give a physical
-sense of distance between the two points, one can note that the commute time distance suggested above is
-actually equivalent to the effective resistance between $x$ and $y$ in an electrical network.
+sense of distance between the two points, one can for example note that the commute time distance suggested
+above is actually equivalent to the effective resistance between $x$ and $y$ in an electrical network.
 This might be a more consistent distance model when modeling for example the most efficient path taking
 traffic into account, as it allows for multiple-route distance diminishment, as shown in
 \cite{klein1993resistance} for example.
@@ -336,12 +364,9 @@ traffic into account, as it allows for multiple-route distance diminishment, as 
 	\hfill
 \end{center}
 
-
-\smallskip
-
 Similarly, the biharmonic distance arises from the equivalent definition when considering the bi-Laplacian
 $\Delta^{2}$ which has the same exact eigenvectors but with squared eigenvalues.
-Those two distances can also be defined using a diffusion process (similarly to the equations in the
+Those two distances can also be defined using a \imp{diffusion process} (similarly to the equations in the
 previous paragraphs), as the expected value of the first arrival at $y$ of a random walk on the mesh
 starting at $x$.
 For the diffusion distance, the discrete diffusion process used in the definition only considers the
@@ -350,13 +375,13 @@ directly tied to the heat equation.
 
 \smallskip
 
-As said, these methods do not contain the geodesics, but may be used as good approximations of the geodesic
-distance, or as regularized versions of the geodesic distance.
-Moreover, when considering $k$ much smaller than $\nv$, it is easy to approximate the distance quite well
-(see Figure \autoref{fig:spectral-approx} below).
+As said, these methods do not contain the geodesics, but may be used as approximations of the geodesic
+distance, or as \imp{regularized} versions of the geodesic distance.
+Moreover, when considering $k$ much smaller than $\nv$, it is possible to approximate the distance
+transform well enough (see Figure \autoref{fig:spectral-approx} below).
 
 \paragraph{Wavefront Propagation}
-The hyperbolic wavefront propagation equation (or d'Alembert equation)
+The \imp{hyperbolic wavefront propagation} equation (or d'Alembert equation)
 \begin{equation*}
 	\frac{\d^{2}}{\d t^{2}}u_{t} = c^{2}\Delta u_{t}, \text{ or }, \square u = 0
 \end{equation*}
@@ -370,7 +395,7 @@ down on impact).
 
 However, while retrieving distance information from Equations \eqref{eq:heat} and \eqref{eq:poisson} is
 not too difficult and doable by solving a simple linear system, retrieving distance from propagating
-wavefronts is more easily done from the non-linear hyperbolic Eikonal equation
+wavefronts is more easily done from the non-linear hyperbolic \imp{Eikonal equation}
 \begin{equation}
 	\begin{cases}
 		\abs{\nabla u}^{2} = 1 & \text{on } M,         \\
@@ -384,10 +409,8 @@ refractive index function of the media encountered.
 In our case, there is a unique medium to be considered, and light sources $\partial M$ that emit the light.
 
 \subsection{Implementation Details}
-Our input manifold is given as a triangular mesh, that is a set $\V$ of vertices of $\R^{3}$ and a set
-$\F \subseteq \left\llbracket 1, \abs{\V}\right\rrbracket^{3}$ of faces passed by indices.
-We are also given a set $\partial M$ of sources or boundaries which will be points we compute the distance
-to (or from).
+In addition to our input PL manifold given as a triangular mesh, we are also given a set $\partial M$ of
+\imp{sources} or boundaries which will be points we compute the distance (transform) to (or from).
 
 \subsubsection{Linear equations}
 In the case of linear equations such as Equations \eqref{eq:heat} and \eqref{eq:poisson}, we only have to
@@ -409,22 +432,22 @@ in $\phi$ the Poisson equation $\Delta \phi = \div X$ on the normalized gradient
 profile.
 This is done by simply computing the divergence operator on the manifold from Equation \autoref{eq:divergence},
 and iterating on the faces to fill the divergence matrix of the manifold and solving another linear system.
-For the Poisson method, a similar transform called the Spalding-Tucker transform exists to better
+For the Poisson method, a similar transform called the \imp{Spalding-Tucker transform} exists to better
 approximate the geodesics. It is computed by $u \mapsto \sqrt{\abs{\nabla u}^{2} + 2u} - \abs{\nabla u}$.
 
 \smallskip
 
-For the spectral methods, we compute the Laplacian matrix in the same fashion as above, and compute its
-eigenspaces (as eigenvalues and eigenvectors).
+For the spectral methods of Equation \eqref{eq:spectral}, we compute the Laplacian matrix in the same
+fashion as above, and compute its eigenspaces (as eigenvalues and eigenvectors).
 We then sort those by increasing eigenvalues, skip the first one and compute the approximate geodesic
-distance for a given value of $k$.
+distance for a given value of $k$, the size of the spectral embedding.
 
-\subsubsection{Fast Marching Method}
+\subsubsection{Fast Marching Method for wavefront propagation}
 While the simple linear system solving works directly for the heat equation, solving for the geodesic paths
 arising from the Eikonal equation \eqref{eq:eikonal} is more difficult, as the equation is non-linear, and
 thus straightforward system resolution techniques will not work.
 
-To work around this issue, we implemented the fast marching algorithm, based on \cite{kimmelsethian}.
+To work around this issue, we implemented the \imp{fast marching algorithm}, based on \cite{kimmelsethian}.
 The method initializes the distance at the sources $\partial M$ to $0$ and iterates using a priority queue
 on the neighbours of the already seen points.
 The distances are not interated according to paths along edges, but so that the Eikonal equation is
@@ -434,13 +457,11 @@ $(i, j, k)$ for $\phi$ (so the norm of the gradient of $\phi$, $\left\lVert\nabl
 as presented in \autoref{fig:Eikonal}.
 \begin{figure}
 	\input{images/fastmarching-gradient}
-	\caption{Representation of the Eikonal equation \eqref{eq:eikonal} $\abs{\nabla \phi} = 1$ on a triangular face $(x_i, x_j, x_k)$ of a mesh.}
+	\caption{Representation of the Eikonal equation $\abs{\nabla \phi} = 1$ on a triangular face $(x_i, x_j, x_k)$ of a mesh.}
 	\label{fig:Eikonal}
 \end{figure}
 A fun complement to the fast marching algorithm is that when the manifold is flat, i.e. when it is locally
 isometric to the Euclidean space, we return to the usual Dijkstra's algorithm.
-
-
 
 \subsubsection{Limitations}
 \paragraph{Linear PDEs}
@@ -450,12 +471,15 @@ every linear system resolution.
 This yields a lot of numerical artifacts when the discretization steps are too big for the precision we
 can compute.
 Moreover, while the method is polynomial, it scales quite poorly as the number of vertices increases, the
-algorithm being in $\mathcal{O}(\nv^{3})$.
+algorithm being in $\mathcal{O}(\nv^{\omega})$ where $\omega$ indicates matrix multiplication complexity.
 
 \paragraph{Spectral and Poisson Methods}
-Some of the issues that arise with those methods are similar to those described above, as they are all based on the linear system solving, a slow process.
-However, the main issue with those methods is that they only allow to describe some distance transform from sources or some distance transform on the step.
-Those methods are thus not as well adapted to the problem of computing geodesics, although they solve a similar class of problems.
+Some of the issues that arise with those methods are similar to those described above, as they are all
+based on the linear system solving, a slow process.
+However, the main issue with those methods is that they only allow to describe some distance transform from
+sources or some distance transform on the step.
+Those methods are thus not as well adapted to the problem of computing geodesics, although they solve a
+similar class of problems.
 
 \paragraph{Fast Marching}
 For the fast marching algorithm, the method is much shorter, as it runs in (theoretical but impractical)
@@ -471,20 +495,27 @@ Moreover, this algorithm cannot be parallelized, unlike the above methods.
 
 \section{Computational Geometry methods}
 \label{sec:comp-geom-methods}
-While PDE-based methods provide a general framework to compute geodesic distances on arbitrary, possibly non-meshed manifolds, we can leverage the fact that our manifold is meshed to design more efficient algorithms.
-A whole class of such algorithms, arising from computational geometry, can be classified according to two main caracteristics.
+While PDE-based methods provide a general framework to compute geodesic distances on arbitrary, possibly
+non-meshed manifolds, we can leverage the fact that our manifold is meshed to design more efficient
+algorithms.
+A whole class of such algorithms, arising from \imp{computational geometry}, can be classified according to
+two main caracteristics.
 
 \paragraph{Global vs.~local} Global methods compute globally optimal paths, up to numerical precision. Local methods start from an initial non-geodesic path and iteratively improve it until convergence to a local minimum.
 \paragraph{Exact vs.~approximate} Exact methods compute the exact geodesic distance, while some approximate methods trade accuracy for speed, and compute only an approximation of the geodesic distance within some guaranteed error bound.
 \vspace{5pt}
 
-In the following, we focus on a global and exact method, the Improved Chen-Han algorithm \cite{chen1990shortest,xin2009improving}.
+In the following, we focus on a global and exact method, the \imp{Improved Chen-Han algorithm}
+\cite{chen1990shortest,xin2009improving}.
 
 \subsection{Continuous Dijkstra}
-The Improved Chen-Han (ICH) algorithm is based on the continuous Dijkstra paradigm introduced by Mitchell et al. for the Mitchell-Mount-Papadimitriou (MMP) algorithm \cite{mitchell1987discrete}.
-The main idea is to apply Dijkstra's algorithm in the continuous setting of a piecewise-linear manifold.
+The Improved Chen-Han (ICH) algorithm is based on the continuous Dijkstra paradigm introduced by Mitchell
+et al. for the \imp{Mitchell-Mount-Papadimitriou (MMP) algorithm} \cite{mitchell1987discrete}.
+The main idea is to apply Dijkstra's algorithm in the continuous setting of a PL manifold.
 
-A first natural approach could be to consider the graph formed by the vertices and edges of the mesh, and run Dijkstra's algorithm on it. However, this would only yield paths that follow the edges of the mesh, which can be arbitrarily longer than the true geodesic paths on the surface (see \autoref{fig:suboptimal-dijkstra}).
+A first natural approach could be to consider the graph formed by the vertices and edges of the mesh, and run Dijkstra's algorithm on it.
+However, this would only yield paths that follow the edges of the mesh, which can be arbitrarily longer
+than the true geodesic paths on the surface (see \autoref{fig:suboptimal-dijkstra}).
 
 \begin{figure}[ht]
 	\centering
@@ -497,14 +528,21 @@ A first natural approach could be to consider the graph formed by the vertices a
 \end{figure}
 
 Instead, we would like to consider each point on the surface as a potential node in the graph.
-However, since the shortest path on a single face is always a straight line, it is sufficient to only consider points on the edges of the mesh as potential nodes.
-This still yields an infinite number of potential nodes; a key concept of the MMP algorithm is to use instead a data structure called \textit{windows}, which encapsulate a continuous interval of points on an edge, along with the information needed to propagate the shortest path from these points to adjacent faces.
+However, since the shortest path on a single face is always a straight line, it is sufficient to only
+consider points on the edges of the mesh as potential nodes.
+This still yields an infinite number of potential nodes; a key concept of the MMP algorithm is to use
+instead a data structure called \imp{windows}, which encapsulate a continuous interval of points on an
+edge, along with the information needed to propagate the shortest path from these points to adjacent faces.
 
 Formally, a window
 \begin{equation*}
 	w = (s, p, e, b_0, b_1, d_0, d_1, \sigma)
 \end{equation*}
-is defined on edge $e$, between points $b_0$ and $b_1$ (see \autoref{fig:ich-windows}). The window represents shortest paths originating from a ``pseudosource'' $p$, at a distance $\sigma$ from the actual source $s$. Distances from $p$ to the endpoints $b_0$ and $b_1$ of the window, respectively $d_0$ and $d_1$, are also stored.
+is defined on edge $e$, between points $b_0$ and $b_1$ (see \autoref{fig:ich-windows}).
+The window represents shortest paths originating from a ``pseudosource'' $p$, at a distance $\sigma$ from
+the actual source $s$.
+Distances from $p$ to the endpoints $b_0$ and $b_1$ of the window, respectively $d_0$ and $d_1$, are also
+stored.
 
 \begin{figure}
 	\centering
@@ -518,10 +556,17 @@ is defined on edge $e$, between points $b_0$ and $b_1$ (see \autoref{fig:ich-win
 \end{figure}
 
 \subsection{Window management and pruning}
-While all revolving around the same core idea of continuous Dijkstra, different algorithms differ in how they manage and propagate windows \cite{craneSurvey}.
-All \emph{propagate} windows, that is, given a window on an edge, either (a) the window goes through a vertex $v$, and two new windows are created on the two edges adjacent to $v$ in the face opposite to $e$; or (b) the window is contained in the opposite edge, and a single window is kept. However, the different algorithms differ in how they prune and prioritize windows to achieve better theoretical and practical complexity.
+While all revolving around the same core idea of continuous Dijkstra, different algorithms differ in how
+they manage and propagate windows \cite{craneSurvey}.
+All \imp{propagate} windows, that is, given a window on an edge,
+either (a) the window goes through a vertex $v$, and two new windows are created on the two edges adjacent to $v$ in the face opposite to $e$;
+or (b) the window is contained in the opposite edge, and a single window is kept.
+However, the different algorithms differ in how they \imp{prune} and prioritize windows to achieve better
+theoretical and practical complexity.
 
-The original MMP algorithm does not perform aggressive pruning of windows, but trim overlapping windows on the same edge to avoid redundancy later on; this simple trimming strategy is illustrated in \autoref{fig:window-trimming-mmp}.
+The original MMP algorithm does not perform aggressive pruning of windows, but trim overlapping windows on
+the same edge to avoid redundancy later on; this simple trimming strategy is illustrated in
+\autoref{fig:window-trimming-mmp}.
 It uses a priority queue to always propagate the window with the smallest minimum distance first, ensuring both global optimality and early trimming of redundant windows.
 \begin{figure}[ht]
 	\centering
@@ -533,7 +578,10 @@ It uses a priority queue to always propagate the window with the smallest minimu
 	\label{fig:window-trimming-mmp}
 \end{figure}
 
-To achieve a better theoretical complexity, the Chen-Han algorithm substitutes the priority queue with a First-In-First-Out (FIFO) queue, propagating windows in the order they were created. To speed up the algorithm in practice, a pruning rule called ``one angle, one split'' is introduced, which we illustrated in \autoref{fig:one-angle-one-split}; however, overlapping windows are not trimmed.
+To achieve a better theoretical complexity, the Chen-Han algorithm substitutes the priority queue with a
+First-In-First-Out (FIFO) queue, propagating windows in the order they were created.
+To speed up the algorithm in practice, a pruning rule called ``one angle, one split'' is introduced,
+which we illustrated in \autoref{fig:one-angle-one-split}; however, overlapping windows are not trimmed.
 
 The Improved Chen-Han algorithm combines both approaches, using a priority queue to always propagate the window with the smallest minimum distance first, while also employing the ``one angle, one split'' pruning rule from Chen-Han. Another filtering strategy, illustrated in \autoref{fig:window-trimming}, is introduced to discard windows that cannot lead to shorter paths than already explored window going through the same vertices.
 
@@ -561,8 +609,9 @@ We refer to \cite{xin2009improving} or to our implementation for details on the 
 
 
 \subsection{Implementation details}
-We implemented the Improved Chen-Hand algorithm from scratch in Rust, following the description from \cite{xin2009improving}.
-We provide here a short description of some implementation details, data structures used, as well as some difficulties we encountered and limitations of our implementation.
+We implemented the Improved Chen-Han algorithm from scratch in Rust, following the description from \cite{xin2009improving}.
+We provide here a short description of some implementation details, data structures used,
+as well as some difficulties we encountered and limitations of our implementation.
 
 \subsubsection{Data structures}
 As other methods, the input of the algorithm is a $2$-manifold represented as a triangle mesh, that is a set of vertices $\V$ and a set of faces ($3$-tuples) $\F$.
@@ -592,28 +641,38 @@ The code for all implementations, as well as the scripts to reproduce the experi
 \end{center}
 
 \subsection{Methodology}
-We collected a set of 27 meshes of various sizes, ranging from 4 to 125'066 vertices.
-Mesh come from various sources, including the Thingi10k dataset \cite{zhou2016thingi10kdataset100003dprinting}, filtered to only contain manifolds with a single connected component.
+We collected a set of 27 meshes of various sizes, ranging from $4$ to $125\,066$ vertices.
+Mesh come from various sources, including the Thingi10k dataset
+\cite{zhou2016thingi10kdataset100003dprinting}, filtered to only contain manifolds with a single connected
+component.
 Each mesh was processed by our implementation of each method, starting from a single source vertex chosen arbitrarily.
-For each mesh, each algorithm is run 10 times with different source vertices, each point corresponding to the average runtime over these runs.
-All experiments were conducted on a MacBook Pro with a 3.22 GHz Apple M1 Pro chip and 32GB of RAM.
-Plots are presented on a log-log scale, and when appropriate, a linear regression is fitted to the data points to estimate the practical time complexity of each method.
+For each mesh, each algorithm has been run 10 times with different source vertices, each point
+corresponding to the average runtime over these runs.
+All experiments were conducted on a MacBook Pro with a 3.22 GHz Apple M1 Pro chip and 32GB of
+RAM.
+Plots are presented on a log-log scale, and when appropriate, a \imp{linear regression} is
+fitted to the data points to estimate the practical time complexity of each method.
 
-Care should be taken when interpreting the following results, as the runtime depends on the specific geometry of the meshes used in the benchmark, and may not generalize to all possible meshes.
+Care should be taken when interpreting the following results, as the runtime depends on the
+specific geometry of the meshes used in the benchmark, and may not generalize to all possible
+meshes.
 The number of vertices is not always a fair indicator of the complexity of the geometry, and other factors such as the distribution of vertex valences and curvature may also impact the practical runtime of the algorithm.
 
 \subsection{Benchmarking of linear PDE methods}
 \paragraph{Runtime of the linear PDE methods}
 In \autoref{fig:heat-experiments-results}, we present the results of our benchmark of the practical
 runtime of the heat method on various meshes.
-In theory, the method computes the laplacian in $\O(\nv^{2})$ then solves two linear systems in
-about $\O(n^{\omega})$ the matrix multiplication complexity (in practice, we should have $\omega \leq \log_{2}(7) = 2.83$ but not much smaller).
-However, we do not observe a clear linear trend in log-log scale as a function of the number of vertices
-on the selected range of sizes.
-We believe this is due to the overhead of face-gradient, divergence and laplacian operators computation for
-small meshes, which takes a lot of added operations, as well as the overhead in the complexity constant
-hidden in the big O notation that the most asymptotically efficient algorithms for matrix multiplication
-and system solving induce and that the asymptotic behavior would be more visible on larger meshes.
+In theory, the method computes the laplacian in quadratic time then solves two linear systems
+in about $\O(n^{\omega})$ the matrix multiplication complexity
+(in practice, we should have $\omega \leq \log_{2}(7) = 2.83$ but not much smaller, which
+fits the observation $\omega \simeq 2.63$ for $\nv$ large enough).
+However, we do not observe a clear linear trend in log-log scale as a function of the number
+of vertices on the selected range of sizes.
+We believe this is due to the overhead of face-gradient, divergence and laplacian operators
+computation for small meshes, which takes a lot of added operations, as well as the overhead
+in the complexity constant hidden in the big O notation that the most asymptotically efficient
+algorithms for matrix multiplication and system solving induce and that the asymptotic
+behavior would be more visible on larger meshes.
 
 \begin{figure}[ht]
 	\centering
@@ -640,7 +699,7 @@ created from different models.
 	\includegraphics[width=\linewidth]{images/accuracy_spectral_methods.pdf}
 	\caption{$\ell^{2}$ error of the spectral embedding on $k$ vectors to the full spectral embedding.
 		Average computed on most of our manifold examples, as a function of the percentage of the dimension
-		$\nv$ used for the embedding size. \textcolor{red}{TODO: \@ antoine ça te convient}}
+		$\nv$ used for the embedding size.}
 	\Description{}
 	\label{fig:spectral-approx}
 \end{figure}
@@ -656,7 +715,7 @@ paths.
 As such, it only approximates geodesics (from the approximation on the mesh), but does so by performing at
 most one $\O(1)$ operation on the minimum element of a priority queue on the vertices, which can be one
 vertex at most once.
-As such, in theory the algorithm runs in $\O(\nv\log\nv)$ when using a fully optimal priority queue.
+As such, in theory, the algorithm runs in $\O(\nv\log\nv)$ when using a fully optimal priority queue.
 \autoref{fig:fastmarching-experiments-results} shows that the default implementation in Rust of the
 priority queues is actually a bit slower\footnote{This is because the \texttt{BinaryHeap} data structure
 	can be dynamically allowed and is as such a bit slower than the theoretical optimum speed.}
@@ -728,13 +787,18 @@ this can be done for the fast marching algorithm at the cost of additional work 
 to Dijkstra) but not for the other PDE-based methods.
 Indeed, while those other methods have the advantage of computing all the distances at once, they also have
 the disadvantage of computing all distances at once and because geodesics are not necessarily locally
-optimal in distance, we cannot reconstruct paths from those methods.
+optimal in distance, we cannot reconstruct exact paths from those methods, but only integrate them in a
+costly manner, both in computing and programming time.
 
 \section*{Conclusion}
 In this report, we investigated different methods to compute shortest-paths on meshed $2$-manifolds embedded in $\R^{3}$.
-We presented two classes of methods: PDE-based methods, which solve physical equations on the manifold to retrieve geodesic distances, and computational geometry methods, which leverage the meshed structure of the manifold to design efficient algorithms.
-We provided from-scratch implementations of three methods: the heat method, fast marching, and the Improved Chen-Han algorithm, and compared their practical performances on various datasets of meshes.
-Our experiments brought to light the practical runtime of each method, as well as their respective strengths and limitations.
+We presented two classes of methods: PDE-based methods, which solve physical equations on the manifold to
+retrieve geodesic distances, and computational geometry methods, which leverage the meshed structure of the
+manifold to design efficient algorithms.
+We provided from-scratch implementations of three methods: the heat method, fast marching, and the Improved
+Chen-Han algorithm, and compared their practical performances on various datasets of meshes.
+Our experiments brought to light the practical runtime of each method, as well as their respective
+strengths and limitations.
 
 \appendix
 \bibliography{report}
