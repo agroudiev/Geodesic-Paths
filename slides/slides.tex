@@ -1,12 +1,17 @@
 \documentclass{slides-template}
 
 %%% Packages
-\usepackage[textsize=small]{todonotes}
 \usepackage{subcaption}
 \usetikzlibrary{3d, arrows.meta, positioning}
 \usepackage{tabularray}
 \UseTblrLibrary{amsmath,booktabs,counter,diagbox,nameref,siunitx,varwidth,zref}
 \input{../report/images/tikz3dheat}
+
+\DefineBibliographyStrings{english}{
+  andothers = {et\addabbrvspace al\adddot},
+  and = {and},
+  in = {in},
+}
 
 \usepackage{caption}
 \setlength{\textfloatsep}{10pt plus 1.0pt minus 2.0pt}
@@ -18,6 +23,27 @@
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
 \bibliography{slides.bib}
+\AtEveryBibitem{%
+  \clearfield{note}
+  \clearfield{publisher}
+  \clearfield{address}
+  \clearfield{journal}
+  \clearfield{volume}
+  \clearfield{number}
+  \clearfield{pages}
+  \clearfield{doi}
+  \clearfield{url}
+  \clearfield{isbn}
+  \clearfield{issn}
+  \clearfield{eprint}
+  \clearfield{series}
+  \clearfield{edition}
+  \clearfield{institution}
+  \clearfield{organization}
+  \clearfield{location}
+  \clearfield{month}
+}
+
 \title[Geodesic Paths and Distances on Meshes]{Geodesic Paths and Distances on Meshes\texorpdfstring{:\\ PDE 
     and Computational Geometry Approaches}{}}
 
@@ -190,6 +216,7 @@
 \end{frame}
 
 \appendix
+\nocite{*}
 \begin{frame}[allowframebreaks]
 	\frametitle{Bibliography}
 	\printbibliography
