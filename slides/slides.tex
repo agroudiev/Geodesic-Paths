@@ -1,0 +1,146 @@
+\documentclass{slides-template}
+
+%%% Packages
+\usepackage[textsize=small]{todonotes}
+\usepackage{subcaption}
+\usetikzlibrary{3d, arrows.meta, positioning}
+\usepackage{tabularray}
+\UseTblrLibrary{amsmath,booktabs,counter,diagbox,nameref,siunitx,varwidth,zref}
+\input{../report/images/tikz3dheat}
+
+\usepackage{caption}
+\setlength{\textfloatsep}{10pt plus 1.0pt minus 2.0pt}
+\setlength{\floatsep}{6pt plus 1.0pt minus 2.0pt}
+\captionsetup{aboveskip=6pt}
+
+\def\div{\mathrm{div}}
+\def\O{\mathcal{O}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\bibliography{slides.bib}
+\title[Geodesic Paths and Distances on Meshes]{Geodesic Paths and Distances on Meshes\texorpdfstring{:\\ PDE 
+    and Computational Geometry Approaches}{}}
+
+\author{Matthieu Pierre Boyer \& Antoine Groudiev}
+
+%%% Preamble
+\def\abs#1{\left|#1\right|}
+\def\R{\mathbb{R}}
+
+\def\V{\mathbb{V}}
+\def\nv{n_{\V}}
+\def\E{E}
+\def\ne{n_{\E}}
+\def\F{\mathcal{F}}
+\def\nf{n_{\F}}
+\def\d{\mathrm{d}}
+
+\def\imp#1{\textcolor{vulm}{\bfseries #1}}
+
+\newcommand\intertitre[1]{%
+	\SetRow{rowsep=1pt,bg=teal!10}
+	\SetCell[c=5]{mode=text,l,font=\itshape\footnotesize}
+	#1 &
+}
+
+\begin{document}
+\maketitle
+
+\begin{frame}{Introduction}
+	\centering
+	\includegraphics[height=3cm]{../report/images/rabbit-paths.png}
+	\hspace{1cm}
+	\includegraphics[height=3cm]{../report/images/venus-paths.png}
+	\hspace{1cm}
+	\includegraphics[height=3cm]{../report/images/star-paths.png}
+\end{frame}
+%
+%
+\begin{frame}{Problem Positioning}
+	\begin{center}
+		Given a mesh of a $2$-manifold embedded in $\mathbb{R}^{3}$ and two points on the mesh, what is the shortest path between the points?
+	\end{center}
+	\pause
+	\textbf{$2$-Manifold:} a surface that looks locally like $\R^{2}$;\\\pause
+	\textbf{Mesh:} a set $\V$ of vertices, a set $\F$ of faces in $\V^{3}$.
+\end{frame}
+
+\section{PDE Methods}
+\begin{frame}{Discrete Differential Geometry}
+	The Laplace-Beltrami operator of a function $u$ is given by:
+	\begin{equation}
+		(\Delta u)_{i} = \frac{1}{2A_{i}}\sum_{e = (i, j)}\left(\cot \alpha_{i, j} + \cot \beta_{i, j}\right)\left(u_{i} - u_{j}\right).
+	\end{equation}
+	It quantifies the symmetric deviation of the variation of the value at a point.
+\end{frame}
+
+\begin{frame}{Physical Equations}
+	We base ourselves on equations modelling the propagation of a phenomenon:
+	\begin{description}
+		\item[Heat Equation] $\delta u_{t} = \frac{\d}{\d t}u_{0}$;
+		\item[Poisson Equation] $\Delta u = u_{0}$ for a fixed distribution $u_{0}$;
+		\item[Spectral Embedding] $\ell^{2}$ distance based on eigenspaces of the laplacian $\Delta$.
+	\end{description}
+\end{frame}
+
+\begin{frame}{Fast Marching}
+	We compute a variation of Dijkstra's algorithm based on the Eikonal equation $\abs{nabla u} = 1$ for
+	wavefront propagation.
+	\begin{center}
+		\input{../report/images/fastmarching-gradient.tex}
+	\end{center}
+\end{frame}
+
+\section{ICH}
+
+\section{Experiments}
+
+\begin{frame}[fragile, allowframebreaks]
+	\frametitle{Compute Time}
+	\begin{center}
+		\includegraphics[width=.9\textwidth]{../report/images/heat_benchmark.pdf}
+		\small
+		Benchmark of the \emph{Heat method} as a function of the number of vertices.
+		Slope: $2.63$, $r^2$: $0.99$.
+		\pause
+		\includegraphics[width=.9\textwidth]{../report/images/fastmarching_benchmark.pdf}
+		\small
+		Benchmark of the \emph{Fast Marching algorithm} as a function of the number of vertices.
+		Slope: $1.51$, $r^2$: $0.98$.
+		\pause
+		\includegraphics[width=.9\textwidth]{../report/images/ich_benchmark.pdf}
+		\small
+		Benchmark of the \emph{ICH algorithm} as a function of the number of vertices.
+		Slope: $1.60$, $r^2$: $0.96$.
+	\end{center}
+\end{frame}
+
+\begin{frame}{Comparison of methods}
+	\begin{tblr}[expand=\intertitre]{%
+		rowspec={Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]},
+		colspec={Q[co=1,c]Q[co=1.5,mode=math,c, font=\scriptsize]Q[mode=math,co=1.5,c,font=\scriptsize]Q[co=1.2,c]Q[c, co=1.5, font=\scriptsize]},
+		hlines = {solid},
+		vline{1, 2, 6} = {solid},
+		vline{3, 4, 5} = {1}{solid},
+		vline{3, 4, 5} = {2-Z}{dashed},
+		row{3, 5, 8}={bg=teal!20!white},
+				row{1} = {c,font=\bfseries,mode=text,fg=white,bg=teal},
+				colsep = 3pt
+			}%
+		Method        & Theoretical Runtime & Actual Runtime                              & Precision & \small Limitations                                              \\
+		\intertitre{PDE-based methods}                                                                                                                                  \\
+		Heat          & \O(\nv^{\omega})    & \underset{\nv \to \infty}{\O(\nv^{\omega})} & Approx.   & Stability, runtime, fixed sources, no paths                     \\
+		Poisson       & \O(\nv^{\omega})    &                                             & Approx.   & Stability, not true geodesics, runtime, fixed sources, no paths \\
+		Spectral      & \O(\nv^{\omega})    &                                             & Approx.   & Stability, not true geodesics, runtime, no paths                \\
+		Fast Marching & \O(\nv\log \nv)     & \O(\nv^{1.5})                               & Approx.   & Fixed sources, limited to meshes, no paths                      \\
+		\intertitre{Computational geometry methods}                                                                                                                     \\
+		ICH           & \O(\nv^{2}\log \nv) & \O(\nv^{1.6})                               & Exact     & Limited to meshes, fixed (but possibly non-edge) sources
+	\end{tblr}
+\end{frame}
+
+\appendix
+\begin{frame}[allowframebreaks]
+	\frametitle{Bibliography}
+	\printbibliography
+\end{frame}
+\end{document}
