@@ -21,8 +21,8 @@
 \def\setbackground#1{\colorlet{main-background}{#1}}
 \def\settextcol#1{\colorlet{main-text}{#1}}
 
-\setmaincolor{vulm!70!black}
-\setaccents{yulm}
+\setmaincolor{purple!70!black}
+\setaccents{white}
 \setbackground{white}
 \settextcol{black}
 
@@ -67,9 +67,9 @@
 \RequirePackage{graphicx}
 \RequirePackage{hyperref}
 \hypersetup{
-	linkbordercolor=vulm,
-	citebordercolor=vulm,
-	menubordercolor=yulm
+	linkbordercolor=purple,
+	citebordercolor=purple,
+	menubordercolor=white
 }
 \RequirePackage[justification=centering]{caption}
 

@@ -35,7 +35,7 @@
 \def\nf{n_{\F}}
 \def\d{\mathrm{d}}
 
-\def\imp#1{\textcolor{vulm}{\bfseries #1}}
+\def\imp#1{\textcolor{purple}{\bfseries #1}}
 
 \newcommand\intertitre[1]{%
 	\SetRow{rowsep=1pt,bg=teal!10}
@@ -48,11 +48,11 @@
 
 \begin{frame}{Introduction}
 	\centering
-	\includegraphics[height=3cm]{../report/images/rabbit-paths.png}
-	\hspace{1cm}
-	\includegraphics[height=3cm]{../report/images/venus-paths.png}
-	\hspace{1cm}
-	\includegraphics[height=3cm]{../report/images/star-paths.png}
+	\includegraphics[height=3.4cm]{../report/images/rabbit-paths.png}
+	\hspace{.5cm}
+	\includegraphics[height=3.4cm]{../report/images/venus-paths.png}
+	\hspace{.5cm}
+	\includegraphics[height=3.4cm]{../report/images/star-paths.png}
 \end{frame}
 %
 %
@@ -63,6 +63,12 @@
 	\pause
 	\textbf{$2$-Manifold:} a surface that looks locally like $\R^{2}$;\\\pause
 	\textbf{Mesh:} a set $\V$ of vertices, a set $\F$ of faces in $\V^{3}$.
+	\begin{figure}
+		\centering
+		\includegraphics[width=.28\linewidth]{../report/images/manifold.png}
+		\includegraphics[width=.3\linewidth]{../report/images/nonmanifold.png}
+		\caption{Examples of a $2$-manifold (left) and non-manifold (right) mesh.}
+	\end{figure}
 \end{frame}
 
 \section{PDE Methods}
@@ -84,7 +90,7 @@
 \end{frame}
 
 \begin{frame}{Fast Marching}
-	We compute a variation of Dijkstra's algorithm based on the Eikonal equation $\abs{nabla u} = 1$ for
+	We compute a variation of Dijkstra's algorithm based on the Eikonal equation $\abs{\nabla u} = 1$ for
 	wavefront propagation.
 	\begin{center}
 		\input{../report/images/fastmarching-gradient.tex}
@@ -92,27 +98,69 @@
 \end{frame}
 
 \section{ICH}
+\begin{frame}{Improved Chen-Han (ICH) Algorithm}
+	\textbf{Idea:} Propagate \imp{windows} accross edges of the mesh, encoding shortest paths from a source.\\\vspace{.3cm}
+	\begin{figure}[ht]
+		\centering
+		\begin{tikzpicture}[scale=1.2]
+			\input{../report/images/window-illustration.tex}
+		\end{tikzpicture}
+		\caption{Illustration of a window $w=(s, p, {\color{blue}e}, {\color{purple}b_0}, {\color{purple}b_1}, {\color{teal}d_0}, {\color{teal}d_1}, \sigma)$.}
+		\label{fig:ich-windows}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{One Angle, One Split Rule}
+	\begin{figure}[ht]
+		\centering
+		\begin{tikzpicture}
+			\input{../report/images/one-angle-one-split.tex}
+		\end{tikzpicture}
+		\caption{Illustration of the ``one angle, one split'' pruning rule: only keep three out of four windows.}
+		\label{fig:one-angle-one-split}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Window Filtering}
+	\begin{figure}[ht]
+		\centering
+		\begin{tikzpicture}
+			\input{../report/images/window-filtering.tex}
+		\end{tikzpicture}
+		\label{fig:window-trimming}
+	\end{figure}
+	We can discard a window $w$ if:
+	\begin{itemize}
+		\item $d+\norm{pb_0} > d_0 + \norm{v_0b_1}$
+		\item $d+\norm{pb_1} > d_1 + \norm{v_1b_1}$
+		\item $d+\norm{pb_0} > d_2 + \norm{v_2b_0}$
+	\end{itemize}
+\end{frame}
 
 \section{Experiments}
 
-\begin{frame}[fragile, allowframebreaks]
-	\frametitle{Compute Time}
-	\begin{center}
-		\includegraphics[width=.9\textwidth]{../report/images/heat_benchmark.pdf}
-		\small
-		Benchmark of the \emph{Heat method} as a function of the number of vertices.
-		Slope: $2.63$, $r^2$: $0.99$.
-		\pause
-		\includegraphics[width=.9\textwidth]{../report/images/fastmarching_benchmark.pdf}
-		\small
-		Benchmark of the \emph{Fast Marching algorithm} as a function of the number of vertices.
-		Slope: $1.51$, $r^2$: $0.98$.
-		\pause
-		\includegraphics[width=.9\textwidth]{../report/images/ich_benchmark.pdf}
-		\small
-		Benchmark of the \emph{ICH algorithm} as a function of the number of vertices.
-		Slope: $1.60$, $r^2$: $0.96$.
-	\end{center}
+\begin{frame}{Compute Time I}
+	\begin{figure}
+		\includegraphics[width=\textwidth]{../report/images/heat_benchmark.pdf}
+		\caption{Benchmark of the \emph{Heat method} as a function of the number of vertices.
+		Slope: $2.63$, $r^2$: $0.99$.}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Compute Time II}
+	\begin{figure}
+		\includegraphics[width=\textwidth]{../report/images/fastmarching_benchmark.pdf}
+		\caption{Benchmark of the \emph{Fast Marching algorithm} as a function of the number of vertices.
+		Slope: $1.51$, $r^2$: $0.98$.}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Compute Time III}
+	\begin{figure}	
+		\includegraphics[width=\textwidth]{../report/images/ich_benchmark.pdf}
+		\caption{Benchmark of the \emph{ICH algorithm} as a function of the number of vertices.
+		Slope: $1.60$, $r^2$: $0.96$.}
+	\end{figure}
 \end{frame}
 
 \begin{frame}{Comparison of methods}
