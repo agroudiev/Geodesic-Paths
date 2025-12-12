@@ -47,13 +47,17 @@
 \begin{document}
 \maketitle
 
+\section{Generalities}
 \begin{frame}{Introduction}
-	\centering
-	\includegraphics[height=3.4cm]{../report/images/rabbit-paths.png}
-	\hspace{.5cm}
-	\includegraphics[height=3.4cm]{../report/images/venus-paths.png}
-	\hspace{.5cm}
-	\includegraphics[height=3.4cm]{../report/images/star-paths.png}
+	\begin{figure}
+		\centering
+		\includegraphics[height=3.4cm]{../report/images/rabbit-paths.png}
+		\hspace{.5cm}
+		\includegraphics[height=3.4cm]{../report/images/venus-paths.png}
+		\hspace{.5cm}
+		\includegraphics[height=3.4cm]{../report/images/star-paths.png}
+		\caption{Geodesic paths from a source point on a bunny, a bust and a icosahedron.}
+	\end{figure}
 \end{frame}
 %
 %
@@ -144,7 +148,7 @@
 	\begin{figure}
 		\includegraphics[width=\textwidth]{../report/images/heat_benchmark.pdf}
 		\caption{Benchmark of the \emph{Heat method} as a function of the number of vertices.
-		Slope: $2.63$, $r^2$: $0.99$.}
+			Slope: $2.63$, $r^2$: $0.99$.}
 	\end{figure}
 \end{frame}
 
@@ -152,38 +156,36 @@
 	\begin{figure}
 		\includegraphics[width=\textwidth]{../report/images/fastmarching_benchmark.pdf}
 		\caption{Benchmark of the \emph{Fast Marching algorithm} as a function of the number of vertices.
-		Slope: $1.51$, $r^2$: $0.98$.}
+			Slope: $1.51$, $r^2$: $0.98$.}
 	\end{figure}
 \end{frame}
 
 \begin{frame}{Compute time: ICH}
-	\begin{figure}	
+	\begin{figure}
 		\includegraphics[width=\textwidth]{../report/images/ich_benchmark.pdf}
 		\caption{Benchmark of the \emph{ICH algorithm} as a function of the number of vertices.
-		Slope: $1.60$, $r^2$: $0.96$.}
+			Slope: $1.60$, $r^2$: $0.96$.}
 	\end{figure}
 \end{frame}
 
 \begin{frame}{Comparison of methods}
 	\begin{tblr}[expand=\intertitre]{%
 		rowspec={Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]Q[m]},
-		colspec={Q[co=1,c]Q[co=1.5,mode=math,c, font=\scriptsize]Q[mode=math,co=1.5,c,font=\scriptsize]Q[co=1.2,c]Q[c, co=1.5, font=\scriptsize]},
+		colspec={Q[co=1,c, font=\small]Q[co=1.5,mode=math,c,font=\footnotesize]Q[mode=math,co=1.5,c,font=\footnotesize]Q[co=1.2,c, font=\small]Q[c, co=1.5, font=\footnotesize]},
 		hlines = {solid},
 		vline{1, 2, 6} = {solid},
 		vline{3, 4, 5} = {1}{solid},
 		vline{3, 4, 5} = {2-Z}{dashed},
-		row{3, 5, 8}={bg=teal!20!white},
-				row{1} = {c,font=\bfseries,mode=text,fg=white,bg=teal},
+		row{3, 5, 8}={bg=main-below!20},
+				row{1} = {c,font=\bfseries\small,mode=text,fg=main-accents,bg=main-below},
 				colsep = 3pt
 			}%
-		Method        & Theoretical Runtime & Actual Runtime                              & Precision & \small Limitations                                              \\
-		\intertitre{PDE-based methods}                                                                                                                                  \\
-		Heat          & \O(\nv^{\omega})    & \underset{\nv \to \infty}{\O(\nv^{\omega})} & Approx.   & Stability, runtime, fixed sources, no paths                     \\
-		Poisson       & \O(\nv^{\omega})    &                                             & Approx.   & Stability, not true geodesics, runtime, fixed sources, no paths \\
-		Spectral      & \O(\nv^{\omega})    &                                             & Approx.   & Stability, not true geodesics, runtime, no paths                \\
-		Fast Marching & \O(\nv\log \nv)     & \O(\nv^{1.5})                               & Approx.   & Fixed sources, limited to meshes, no paths                      \\
-		\intertitre{Computational geometry methods}                                                                                                                     \\
-		ICH           & \O(\nv^{2}\log \nv) & \O(\nv^{1.6})                               & Exact     & Limited to meshes, fixed (but possibly non-edge) sources
+		Method        & Theoretical Runtime & Actual Runtime   & Precision & \small Main limits \\
+		Heat          & \O(\nv^{\omega})    & \O(\nv^{\omega}) & Approx.   & No paths           \\
+		Poisson       & \O(\nv^{\omega})    &                  & Approx.   & Not geodesics      \\
+		Spectral      & \O(\nv^{\omega})    &                  & Approx.   & Not geodesics      \\
+		Fast Marching & \O(\nv\log \nv)     & \O(\nv^{1.5})    & Approx.   & Fixed sources      \\
+		ICH           & \O(\nv^{2}\log \nv) & \O(\nv^{1.6})    & Exact     & Limited to meshes
 	\end{tblr}
 \end{frame}
 
